@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="phone_number_max_length">10</integer>
+    <integer name="sms_code_max_length">6</integer>
+    <integer name="chat_head_message_max_lines">1</integer>
+</resources>

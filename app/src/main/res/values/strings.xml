@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Telegram</string>
+    <string name="enter_phone_number">Enter you phone\nnumber to get started</string>
+    <string name="enter_phone_number_tools">Enter you phone<br/>number to get started</string>
+    <string name="receive_verification_code">You will receive a verification code.\nCarrier rates may apply.</string>
+    <string name="receive_verification_code_tools">You will receive a verification code.<br/>Carrier rates may apply.</string>
+    <string name="next">Next</string>
+    <string name="country_name">United States</string>
+    <string name="invalid_phone_number">Invalid Phone Number</string>
+    <string name="enter_sms_code">Enter the code we sent\nto %s</string>
+    <string name="enter_sms_code_tools">Enter the code we sent<br/>to +1 4525559876</string>
+    <string name="text_message">Hey! Let\'s meet at the cafe.</string>
+    <string name="contactName">Dwayne Johnson</string>
+    <string name="message">Message</string>
+    <string name="sample_message">Hello</string>
+</resources>

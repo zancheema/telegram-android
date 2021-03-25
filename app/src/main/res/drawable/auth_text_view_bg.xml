@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <stroke android:color="@android:color/darker_gray"
+        android:width="@dimen/auth_text_view_stroke_width"/>
+    <corners android:radius="@dimen/auth_text_view_corner_radius" />
+    <padding
+        android:bottom="@dimen/auth_text_view_padding"
+        android:left="@dimen/auth_text_view_padding"
+        android:right="@dimen/auth_text_view_padding"
+        android:top="@dimen/auth_text_view_padding" />
+</shape>
