@@ -1,31 +1,32 @@
 package com.zancheema.android.telegram.chats
 
+import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import com.zancheema.android.telegram.databinding.ChatsFragmentBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.zancheema.android.telegram.R
 
-@AndroidEntryPoint
 class ChatsFragment : Fragment() {
 
-    private val viewModel by viewModels<ChatsViewModel>()
-    private lateinit var viewDataBinding: ChatsFragmentBinding
+    companion object {
+        fun newInstance() = ChatsFragment()
+    }
+
+    private lateinit var viewModel: ChatsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        viewDataBinding = ChatsFragmentBinding.inflate(inflater, container, false)
-            .apply { viewmodel = viewModel }
-        return viewDataBinding.root
+    ): View? {
+        return inflater.inflate(R.layout.chats_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewDataBinding.lifecycleOwner = viewLifecycleOwner
+        viewModel = ViewModelProvider(this).get(ChatsViewModel::class.java)
+        // TODO: Use the ViewModel
     }
+
 }

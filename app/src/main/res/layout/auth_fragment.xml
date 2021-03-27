@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/enter_phone_number"
+            android:text="@string/enter_phone_number_to_get_started"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -45,32 +45,40 @@
         <com.hbb20.CountryCodePicker
             android:id="@+id/countryCodePicker"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:gravity="center"
             app:country_code="@={viewmodel.countryCode}"
             app:country_name="@={viewmodel.countryName}"
-            app:layout_constraintEnd_toStartOf="@+id/editPhoneNumber"
+            app:layout_constraintBottom_toBottomOf="@+id/etPhoneNumberLayout"
+            app:layout_constraintEnd_toStartOf="@+id/etPhoneNumberLayout"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/authCountry" />
+            app:layout_constraintTop_toTopOf="@+id/etPhoneNumberLayout" />
 
-        <EditText
-            android:id="@+id/editPhoneNumber"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/etPhoneNumberLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/auth_text_view_bg"
-            android:ems="10"
-            android:inputType="phone"
-            android:maxLength="@integer/phone_number_max_length"
-            android:text="@={viewmodel.phoneNumber}"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/countryCodePicker"
-            app:layout_constraintTop_toBottomOf="@+id/authCountry" />
+            app:layout_constraintTop_toBottomOf="@+id/authCountryLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/enter_phone_number"
+                android:inputType="phone"
+                android:maxLength="@integer/phone_number_max_length"
+                android:text="@={viewmodel.phoneNumber}"
+                tools:text="@string/sample_phone_number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/confirmPhoneNumberButton"
@@ -83,22 +91,31 @@
             android:text="@string/next"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editPhoneNumber" />
+            app:layout_constraintTop_toBottomOf="@+id/etPhoneNumberLayout" />
 
-        <TextView
-            android:id="@+id/authCountry"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/authCountryLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:background="@drawable/auth_text_view_bg"
-            android:text="@{viewmodel.countryName}"
-            android:textAlignment="center"
-            android:textStyle="bold"
+            android:layout_marginHorizontal="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3"
-            tools:text="@string/country_name" />
+            app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/authCountry"
+                android:layout_width="match_parent"
+                android:textStyle="bold"
+                android:focusable="false"
+                android:textAlignment="center"
+                tools:text="@string/sample_country_name"
+                android:layout_height="wrap_content"
+                android:text="@{viewmodel.countryName}"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

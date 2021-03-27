@@ -24,22 +24,6 @@ class LocalDataSource(
         TODO("Not yet implemented")
     }
 
-    override fun observeAllChatRooms(): LiveData<Result<List<ChatRoom>>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun observeChatRoomDetailByChatRoomId(chatRoomId: String): LiveData<Result<ChatRoomDetail>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun observeChatRoomMembersByChatRoomId(chatRoomId: String): LiveData<Result<List<ChatRoomMember>>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun observeChatRoomMembersByPhoneNumber(phoneNumber: String): LiveData<Result<List<ChatRoomMember>>> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getUserByPhoneNumber(phoneNumber: String): Result<User> =
         withContext(ioDispatcher) {
             try {
@@ -62,30 +46,6 @@ class LocalDataSource(
             }
         }
 
-    override suspend fun getAllChatRooms(): Result<List<ChatRoom>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getChatRoomDetailByChatRoomId(chatRoomId: String): Result<ChatRoomDetail> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getChatRoomMembersByChatRoomId(chatRoomId: String): Result<List<ChatRoomMember>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getChatRoomMembersByPhoneNumber(phoneNumber: String): Result<List<ChatRoomMember>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getChatMessageById(id: String): Result<ChatMessage> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getChatMessagesByChatRoomId(chatRoomId: String): Result<List<ChatMessage>> {
-        TODO("Not yet implemented")
-    }
-
     private fun domainError(message: String) = Error(Exception(message))
 
     override suspend fun saveUser(user: User) = withContext(ioDispatcher) {
@@ -102,22 +62,6 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun saveChatRoom(chatRoom: ChatRoom) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun saveChatRoomDetail(detail: ChatRoomDetail) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun saveChatRoomMember(member: ChatRoomMember) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun saveChatMessage(message: ChatMessage) {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun deleteUser(user: User) {
         deleteUserWithPhoneNumber(user.phoneNumber)
     }
@@ -130,29 +74,5 @@ class LocalDataSource(
                 println("error deleting user: ${e.message}")
             }
         }
-    }
-
-    override suspend fun deleteChatRoom(chatRoom: ChatRoom) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteChatRoomWithId(id: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteAllChatRooms() {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteChatMessage(message: ChatMessage) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteChatMessageWithId(id: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteChatMessagesByChatRoomId(chatRoomId: String) {
-        TODO("Not yet implemented")
     }
 }

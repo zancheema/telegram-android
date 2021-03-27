@@ -23,7 +23,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
-            android:text="@{@string/enter_sms_code(viewmodel.phoneNumber)}"
+            android:text="@{@string/enter_sms_code_sent(viewmodel.phoneNumber)}"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,20 +31,32 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/enter_sms_code_tools" />
 
-        <EditText
-            android:id="@+id/editSmsCode"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:background="@drawable/auth_text_view_bg"
-            android:ems="10"
-            android:inputType="number"
-            android:maxLength="@integer/sms_code_max_length"
-            android:text="@={viewmodel.smsCode}"
             app:layout_constraintEnd_toEndOf="@+id/enterSmsCodeTitle"
             app:layout_constraintHorizontal_bias="1.0"
+            android:hint="@string/enter_6_digit_code"
             app:layout_constraintStart_toStartOf="@+id/enterSmsCodeTitle"
-            app:layout_constraintTop_toBottomOf="@+id/enterSmsCodeTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/enterSmsCodeTitle"
+            android:id="@+id/editSmsCodeLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginHorizontal="16dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editSmsCode"
+                android:layout_width="match_parent"
+                android:inputType="number"
+                android:maxLength="@integer/sms_code_max_length"
+                android:textAlignment="center"
+                tools:text="@string/sample_sms_code"
+                android:layout_height="wrap_content"
+                android:text="@={viewmodel.smsCode}"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/confirmSmsCodeButton"
@@ -53,8 +65,8 @@
             android:layout_marginTop="32dp"
             android:onClick="@{() -> viewmodel.verify()}"
             android:text="@string/next"
-            app:layout_constraintEnd_toEndOf="@+id/editSmsCode"
-            app:layout_constraintStart_toStartOf="@+id/editSmsCode"
-            app:layout_constraintTop_toBottomOf="@+id/editSmsCode" />
+            app:layout_constraintEnd_toEndOf="@+id/editSmsCodeLayout"
+            app:layout_constraintStart_toStartOf="@+id/editSmsCodeLayout"
+            app:layout_constraintTop_toBottomOf="@+id/editSmsCodeLayout" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
