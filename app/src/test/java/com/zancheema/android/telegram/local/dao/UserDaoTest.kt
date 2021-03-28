@@ -57,6 +57,20 @@ class UserDaoTest {
 
     @ExperimentalCoroutinesApi
     @Test
+    fun insertUsersAndGetAll() = runBlockingTest {
+        val users = listOf(
+            DbUser("+12345556732"),
+            DbUser("+12345556764"),
+            DbUser("+193445556732")
+        )
+        users.forEach { database.userDao().insertUser(it) }
+
+        val loaded = database.userDao().getAll()
+        assertThat(loaded, `is`(users))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
     fun insertUserAndGetByPhoneNumber() = runBlockingTest {
         val user = DbUser("+15465558912")
         database.userDao().insertUser(user)
