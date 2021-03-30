@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.zancheema.android.telegram.data.source.local.dao.*
 import com.zancheema.android.telegram.data.source.local.entity.*
+import com.zancheema.android.telegram.data.source.local.view.DbChat
 
 @Database(
     entities = [
@@ -12,6 +13,7 @@ import com.zancheema.android.telegram.data.source.local.entity.*
         DbChatRoom::class,
         DbChatMessage::class
     ],
+    views = [DbChat::class],
     version = 1,
     exportSchema = false
 )
