@@ -9,7 +9,8 @@ import com.zancheema.android.telegram.data.source.local.entity.*
     entities = [
         DbUser::class,
         DbUserDetail::class,
-        DbChatRoom::class
+        DbChatRoom::class,
+        DbChatMessage::class
     ],
     version = 1,
     exportSchema = false
@@ -18,4 +19,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun userDetailDao(): UserDetailDao
     abstract fun chatRoomDao(): ChatRoomDao
+    abstract fun chatMessageDao(): ChatMessageDao
 }
