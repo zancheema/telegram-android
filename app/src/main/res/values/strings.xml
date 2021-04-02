@@ -17,4 +17,5 @@
     <string name="sample_phone_number">7455551234</string>
     <string name="sample_sms_code">123400</string>
     <string name="enter_6_digit_code">Enter 6-digit code</string>
+    <string name="invalid_chat">Invalid Chat</string>
 </resources>
