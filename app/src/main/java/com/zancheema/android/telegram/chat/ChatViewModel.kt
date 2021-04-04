@@ -1,6 +1,8 @@
 package com.zancheema.android.telegram.chat
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.zancheema.android.telegram.Event
 import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.Result.Error
@@ -11,6 +13,8 @@ import com.zancheema.android.telegram.data.source.domain.ChatMessage
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import java.util.UUID.randomUUID
 import javax.inject.Inject
 
 @ViewModelScoped
@@ -19,12 +23,14 @@ class ChatViewModel @Inject constructor(
 ) : ViewModel() {
     val chat = MutableStateFlow<Chat?>(null)
 
+    val messageText = MutableLiveData<String>()
+
     private val _invalidChatEvent = MutableStateFlow(Event(0))
     val invalidChatEvent: Flow<Event<Int>>
         get() = _invalidChatEvent
 
     @FlowPreview
-    val messages: Flow<List<ChatMessage>>
+    val chatMessages: Flow<List<ChatMessage>>
         get() = chat
             .flatMapConcat { chat ->
                 try {
@@ -41,4 +47,23 @@ class ChatViewModel @Inject constructor(
                     else -> emptyList()
                 }
             }
+
+    fun sendMessage() {
+        val message = messageText.value
+        val chatValue = chat.value
+
+        messageText.value = "" // clear the text
+
+        if (!message.isNullOrBlank() && chatValue != null) {
+            viewModelScope.launch {
+                repository.saveChatMessage(
+                    ChatMessage(
+                        randomUUID().toString(),
+                        chatValue.chatRoomId,
+                        message
+                    )
+                )
+            }
+        }
+    }
 }

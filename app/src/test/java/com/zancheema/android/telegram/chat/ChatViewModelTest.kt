@@ -76,6 +76,26 @@ class ChatViewModelTest {
     @FlowPreview
     @ExperimentalCoroutinesApi
     @Test
+    fun messages_ChatIsNull_GeneratesInvalidChatEventAndReturnsChatMessagesAsEmptyList() =
+        runBlockingTest {
+            val messages = listOf(
+                ChatMessage("msg_1", chat.chatRoomId, "Hello"),
+                ChatMessage("msg_1", chat.chatRoomId, "Hey", isMine = false),
+                ChatMessage("msg_1", chat.chatRoomId, "How's it going?")
+            )
+            messages.forEach { repository.saveChatMessage(it) }
+
+            val loaded = viewModel.chatMessages.first()
+            assertThat(loaded, `is`(emptyList()))
+            assertThat(
+                viewModel.invalidChatEvent.first().getContentIfNotHandled(),
+                `is`(R.string.invalid_chat)
+            )
+        }
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
+    @Test
     fun messages_ChatNotNull_ReturnsChatMessagesWithChatRoomId() = runBlockingTest {
         viewModel.chat.value = chat
 
@@ -86,27 +106,23 @@ class ChatViewModelTest {
         )
         messages.forEach { repository.saveChatMessage(it) }
 
-        val loaded = viewModel.messages.first()
+        val loaded = viewModel.chatMessages.first()
         assertThat(loaded, `is`(messages))
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
     @Test
-    fun messages_ChatIsNull_GeneratesInvalidChatEventAndRetunsChatMessagesAsEmptyList() =
-        runBlockingTest {
-            val messages = listOf(
-                ChatMessage("msg_1", chat.chatRoomId, "Hello"),
-                ChatMessage("msg_1", chat.chatRoomId, "Hey", isMine = false),
-                ChatMessage("msg_1", chat.chatRoomId, "How's it going?")
-            )
-            messages.forEach { repository.saveChatMessage(it) }
+    fun sendingNewMessageAddsChatMessageToMessages() = runBlockingTest {
+        val message = "Hello"
+        viewModel.chat.value = chat
+        viewModel.messageText.value = message
+        viewModel.sendMessage()
 
-            val loaded = viewModel.messages.first()
-            assertThat(loaded, `is`(emptyList()))
-            assertThat(
-                viewModel.invalidChatEvent.first().getContentIfNotHandled(),
-                `is`(R.string.invalid_chat)
-            )
-        }
+        val loaded = viewModel.chatMessages.first()
+        assertThat(loaded.size, `is`(1))
+        assertThat(loaded[0].message, `is`(message))
+        assertThat(loaded[0].chatRoomId, `is`(chat.chatRoomId))
+        assertThat(loaded[0].isMine, `is`(true))
+    }
 }
