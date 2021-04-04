@@ -1,6 +1,7 @@
 package com.zancheema.android.telegram.source
 
 import com.zancheema.android.telegram.data.source.AppRepository
+import com.zancheema.android.telegram.data.source.domain.ChatRoom
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import kotlinx.coroutines.runBlocking
@@ -15,4 +16,8 @@ fun AppRepository.saveUserBlocking(user: User) = runBlocking {
 
 fun AppRepository.saveUserDetailBlocking(detail: UserDetail) = runBlocking {
     this@saveUserDetailBlocking.saveUserDetail(detail)
+}
+
+fun AppRepository.saveChatRoomBlocking(room: ChatRoom) = runBlocking {
+    this@saveChatRoomBlocking.saveChatRoom(room)
 }

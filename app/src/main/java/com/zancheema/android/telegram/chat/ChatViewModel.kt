@@ -10,14 +10,14 @@ import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.Chat
 import com.zancheema.android.telegram.data.source.domain.ChatMessage
-import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.UUID.randomUUID
 import javax.inject.Inject
 
-@ViewModelScoped
+@HiltViewModel
 class ChatViewModel @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {

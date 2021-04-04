@@ -22,6 +22,9 @@
         android:name="com.zancheema.android.telegram.chats.ChatsFragment"
         android:label="chats_fragment"
         tools:layout="@layout/chats_fragment" >
+        <action
+            android:id="@+id/action_chatsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
@@ -45,5 +48,13 @@
         <action
             android:id="@+id/action_verifyCodeFragment_to_chatsFragment"
             app:destination="@id/chatsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.zancheema.android.telegram.chat.ChatFragment"
+        android:label="ChatFragment" >
+        <argument
+            android:name="chat"
+            app:argType="com.zancheema.android.telegram.data.source.domain.Chat" />
     </fragment>
 </navigation>

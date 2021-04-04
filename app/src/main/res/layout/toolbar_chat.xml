@@ -5,8 +5,8 @@
 
     <data>
         <variable
-            name="user"
-            type="com.zancheema.android.telegram.data.source.domain.UserDetail" />
+            name="chat"
+            type="com.zancheema.android.telegram.data.source.domain.Chat" />
     </data>
 
     <Toolbar
@@ -20,7 +20,7 @@
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/ivProfilePic"
-                app:profile_image_url="@{user.photoUrl}"
+                app:profile_image_url="@{chat.photoUrl}"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:scaleType="fitCenter"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:textColor="@color/white"
-                android:text="@{user.fullName}"
+                android:text="@{chat.userName}"
                 app:layout_constraintBottom_toBottomOf="@id/ivProfilePic"
                 app:layout_constraintStart_toEndOf="@id/ivProfilePic"
                 app:layout_constraintTop_toTopOf="@id/ivProfilePic"
