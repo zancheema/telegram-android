@@ -18,4 +18,13 @@
     <string name="sample_sms_code">123400</string>
     <string name="enter_6_digit_code">Enter 6-digit code</string>
     <string name="invalid_chat">Invalid Chat</string>
+    <string name="sample_username">John Doe</string>
+
+    <string name="dummy_paragraph">
+        Lorem Ipsum is simply dummy text of the printing
+        and typesetting industry. Lorem Ipsum has been the
+        industry\'s standard dummy text ever since the 1500s,
+        when an unknown printer took a galley of type and
+        scrambled
+    </string>
 </resources>

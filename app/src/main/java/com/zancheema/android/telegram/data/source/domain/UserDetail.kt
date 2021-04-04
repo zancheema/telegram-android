@@ -11,7 +11,8 @@ data class UserDetail(
     val firstName: String,
     val lastName: String,
     val imgUrl: String = "nothing",
-    val msgToken: String = "nothing"
+    val msgToken: String = "nothing",
+    val photoUrl: String = ""
 ) : Parcelable {
     @IgnoredOnParcel
     val fullName = "$firstName $lastName"

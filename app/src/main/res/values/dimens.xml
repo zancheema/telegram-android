@@ -16,4 +16,8 @@
     <dimen name="message_padding_start">6dp</dimen>
     <dimen name="message_padding_top">4dp</dimen>
     <dimen name="message_radius">12dp</dimen>
+    <dimen name="corner_radius_text_view">8dp</dimen>
+    <dimen name="corner_radius_round_chat_message">8dp</dimen>
+    <dimen name="none">0dp</dimen>
+    <dimen name="max_width_chat_message">240dp</dimen>
 </resources>
