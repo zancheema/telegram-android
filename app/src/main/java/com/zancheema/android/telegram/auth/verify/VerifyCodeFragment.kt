@@ -10,8 +10,8 @@ import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.EventObserver
-import com.zancheema.android.telegram.auth.verify.VerifyCodeFragmentDirections.Companion.actionVerifyCodeFragmentToChatsFragment
 import com.zancheema.android.telegram.auth.verify.VerifyCodeFragmentDirections.Companion.actionVerifyCodeFragmentToRegisterFragment
+import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionGlobalChatsFragment
 import com.zancheema.android.telegram.databinding.VerifyCodeFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,7 +43,7 @@ class VerifyCodeFragment : Fragment() {
             if (it) findNavController().navigate(actionVerifyCodeFragmentToRegisterFragment())
         })
         viewModel.showChatsEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) findNavController().navigate(actionVerifyCodeFragmentToChatsFragment())
+            if (it) findNavController().navigate(actionGlobalChatsFragment())
         })
     }
 
