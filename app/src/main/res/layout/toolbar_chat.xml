@@ -19,7 +19,7 @@
             android:layout_height="wrap_content">
 
             <com.mikhaellopez.circularimageview.CircularImageView
-                android:id="@+id/ivProfilePic"
+                android:id="@+id/ivChat"
                 app:profile_image_url="@{chat.photoUrl}"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
@@ -29,15 +29,15 @@
                 app:srcCompat="@drawable/ic_baseline_person_24" />
 
             <TextView
-                android:id="@+id/tvUsername"
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:textColor="@color/white"
                 android:text="@{chat.userName}"
-                app:layout_constraintBottom_toBottomOf="@id/ivProfilePic"
-                app:layout_constraintStart_toEndOf="@id/ivProfilePic"
-                app:layout_constraintTop_toTopOf="@id/ivProfilePic"
+                app:layout_constraintBottom_toBottomOf="@id/ivChat"
+                app:layout_constraintStart_toEndOf="@id/ivChat"
+                app:layout_constraintTop_toTopOf="@id/ivChat"
                 tools:text="@string/sample_username" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </Toolbar>

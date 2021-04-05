@@ -9,10 +9,10 @@ import com.zancheema.android.telegram.data.source.local.entity.DbChatMessage
 
 @Dao
 interface ChatMessageDao {
-    @Query("SELECT * FROM chat_messages")
+    @Query("SELECT * FROM chat_messages ORDER BY timestamp DESC")
     suspend fun getAll(): List<DbChatMessage>
 
-    @Query("SELECT * FROM chat_messages WHERE chat_room_id = :id")
+    @Query("SELECT * FROM chat_messages WHERE chat_room_id = :id ORDER BY timestamp DESC")
     suspend fun getByChatRoomId(id: String): List<DbChatMessage>
 
     @Query("SELECT * FROM chat_messages WHERE id = :id")

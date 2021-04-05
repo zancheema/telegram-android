@@ -21,6 +21,11 @@ android {
 
         testInstrumentationRunner "com.zancheema.android.telegram.CustomTestRunner"
 
+        // The following argument makes the Android Test Orchestrator run its
+        // "pm clear" command after each test invocation. This command ensures
+        // that the app's state is completely cleared between tests.
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.incremental": "true"]
@@ -61,9 +66,13 @@ android {
     buildFeatures {
         dataBinding true
     }
-    testOptions.unitTests {
-        returnDefaultValues true
-        includeAndroidResources true
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+
+        unitTests {
+            returnDefaultValues true
+            includeAndroidResources true
+        }
     }
 }
 
@@ -121,7 +130,9 @@ dependencies {
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+    androidTestUtil "androidx.test:orchestrator:$androidx_test_core_version"
 
     // Once https://issuetracker.google.com/127986458 is fixed this can be testImplementation
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"

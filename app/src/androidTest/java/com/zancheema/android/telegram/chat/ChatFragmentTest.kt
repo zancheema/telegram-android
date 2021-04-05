@@ -1,22 +1,16 @@
 package com.zancheema.android.telegram.chat
 
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.R
-import com.zancheema.android.telegram.data.source.domain.Chat
-import com.zancheema.android.telegram.data.source.domain.ChatRoom
-import com.zancheema.android.telegram.data.source.domain.User
-import com.zancheema.android.telegram.data.source.domain.UserDetail
+import com.zancheema.android.telegram.data.source.domain.*
 import com.zancheema.android.telegram.di.AppRepositoryModule
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
-import com.zancheema.android.telegram.source.FakeRepository
-import com.zancheema.android.telegram.source.saveChatRoomBlocking
-import com.zancheema.android.telegram.source.saveUserBlocking
-import com.zancheema.android.telegram.source.saveUserDetailBlocking
+import com.zancheema.android.telegram.source.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
@@ -60,10 +54,50 @@ class ChatFragmentTest {
 
     @Test
     fun fragmentLaunchesSuccessfully() {
-        val args = ChatFragmentArgs(chat)
-        launchFragmentInHiltContainer<ChatFragment>(args.toBundle(), R.style.Theme_Telegram)
+        launchChat()
 
         onView(withId(R.id.messageList))
             .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun toolbarDisplaysSenderName() {
+        launchChat()
+
+        onView(withId(R.id.tvTitle))
+            .check(matches(withText(sender.firstName)))
+    }
+
+    @Test
+    fun typeAndSendMessage_MessageIsDisplayedInMessageList() {
+        launchChat()
+        val message = "Hey there!"
+
+        onView(withId(R.id.etMessage))
+            .perform(typeText(message), closeSoftKeyboard())
+        onView(withId(R.id.fabSendMessage))
+            .perform(click())
+
+        onView(withId(R.id.messageList))
+            .check(matches(hasDescendant(withText(message))))
+        onView(withId(R.id.etMessage))
+            .check(matches(withText("")))
+    }
+
+    @Test
+    fun receivedMessageIsShownInMessageList() {
+        launchChat()
+
+        // new message is received from outside
+        val chatMessage = ChatMessage("msg_1", chat.chatRoomId, "Hello", false)
+        repository.saveChatMessageBlocking(chatMessage)
+
+        onView(withId(R.id.messageList))
+            .check(matches(hasDescendant(withText(chatMessage.message))))
+    }
+
+    private fun launchChat() {
+        val args = ChatFragmentArgs(chat)
+        launchFragmentInHiltContainer<ChatFragment>(args.toBundle(), R.style.Theme_Telegram)
     }
 }
