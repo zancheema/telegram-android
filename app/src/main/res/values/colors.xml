@@ -11,4 +11,5 @@
     <color name="color_primary">#7BA1E4</color>
     <color name="color_primary_variant">#6688C5</color>
     <color name="light_pale_green">#F3FDE5</color>
+    <color name="gray">#A0A0A0</color>
 </resources>

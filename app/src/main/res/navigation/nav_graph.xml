@@ -57,4 +57,9 @@
             android:name="chat"
             app:argType="com.zancheema.android.telegram.data.source.domain.Chat" />
     </fragment>
+    <action
+        android:id="@+id/action_global_chatsFragment"
+        app:destination="@id/chatsFragment"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
 </navigation>

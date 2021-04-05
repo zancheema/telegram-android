@@ -27,4 +27,7 @@
         when an unknown printer took a galley of type and
         scrambled
     </string>
+    <string name="contacts">Contacts</string>
+    <string name="calls">Calls</string>
+    <string name="settings">Settings</string>
 </resources>
