@@ -13,6 +13,7 @@ import com.zancheema.android.telegram.EventObserver
 import com.zancheema.android.telegram.auth.verify.VerifyCodeFragmentDirections.Companion.actionVerifyCodeFragmentToRegisterFragment
 import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionGlobalChatsFragment
 import com.zancheema.android.telegram.databinding.VerifyCodeFragmentBinding
+import com.zancheema.android.telegram.util.EspressoIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,7 +35,6 @@ class VerifyCodeFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewDataBinding.lifecycleOwner = viewLifecycleOwner
         setUpArgs()
-        setUpAuth()
         setUpNavigation()
     }
 
@@ -44,17 +44,6 @@ class VerifyCodeFragment : Fragment() {
         })
         viewModel.showChatsEvent.observe(viewLifecycleOwner, EventObserver {
             if (it) findNavController().navigate(actionGlobalChatsFragment())
-        })
-    }
-
-    private fun setUpAuth() {
-        viewModel.verificationEvent.observe(viewLifecycleOwner, EventObserver { credentials ->
-            Firebase.auth.signInWithCredential(credentials)
-                .addOnCompleteListener { result ->
-                    if (result.isSuccessful) {
-                        viewModel.showRegistration()
-                    }
-                }
         })
     }
 

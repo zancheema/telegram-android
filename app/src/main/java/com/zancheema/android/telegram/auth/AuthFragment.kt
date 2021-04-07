@@ -19,6 +19,7 @@ import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.acti
 import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionAuthFragmentToVerifyCodeFragment
 import com.zancheema.android.telegram.util.setUpSnackar
 import com.zancheema.android.telegram.databinding.AuthFragmentBinding
+import com.zancheema.android.telegram.util.EspressoIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 
@@ -70,6 +71,7 @@ class AuthFragment : Fragment() {
                     verificationId: String,
                     forceResendingToken: PhoneAuthProvider.ForceResendingToken
                 ) {
+                    EspressoIdlingResource.decrement()
                     val action = actionAuthFragmentToVerifyCodeFragment(
                         phoneNumber,
                         verificationId
@@ -80,6 +82,7 @@ class AuthFragment : Fragment() {
                 override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
                     Firebase.auth.signInWithCredential(phoneAuthCredential)
                         .addOnCompleteListener { task ->
+                            EspressoIdlingResource.decrement()
                             if (task.isSuccessful) {
                                 findNavController().navigate(actionAuthFragmentToRegisterFragment())
                             }
@@ -98,5 +101,6 @@ class AuthFragment : Fragment() {
             .build()
 
         PhoneAuthProvider.verifyPhoneNumber(options)
+        EspressoIdlingResource.increment()
     }
 }

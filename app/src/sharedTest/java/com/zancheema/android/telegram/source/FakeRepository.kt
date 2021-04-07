@@ -8,6 +8,7 @@ import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.*
+import com.zancheema.android.telegram.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
@@ -95,13 +96,14 @@ class FakeRepository @Inject constructor() : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun isRegisteredPhoneNumber(phoneNumber: String): Result<Boolean> =
-        withContext(Dispatchers.IO) {
+    override suspend fun isRegisteredPhoneNumber(phoneNumber: String): Result<Boolean> {
+        wrapEspressoIdlingResource {
             for (u in observableUsers.value!!) {
-                if (u.phoneNumber == phoneNumber) return@withContext Success(true)
+                if (u.phoneNumber == phoneNumber) return Success(true)
             }
-            Success(false)
+            return Success(false)
         }
+    }
 
     override fun observeUserExists(): LiveData<Result<Boolean>> =
         observableUser.map { Success(it != null) }

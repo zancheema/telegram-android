@@ -1,4 +1,4 @@
-package com.zancheema.android.telegram.source
+package com.zancheema.android.telegram.util
 
 import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.ChatMessage

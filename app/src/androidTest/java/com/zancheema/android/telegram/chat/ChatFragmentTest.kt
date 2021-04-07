@@ -11,6 +11,10 @@ import com.zancheema.android.telegram.data.source.domain.*
 import com.zancheema.android.telegram.di.AppRepositoryModule
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
 import com.zancheema.android.telegram.source.*
+import com.zancheema.android.telegram.util.saveChatMessageBlocking
+import com.zancheema.android.telegram.util.saveChatRoomBlocking
+import com.zancheema.android.telegram.util.saveUserBlocking
+import com.zancheema.android.telegram.util.saveUserDetailBlocking
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules

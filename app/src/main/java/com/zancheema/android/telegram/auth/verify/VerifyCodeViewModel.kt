@@ -1,17 +1,26 @@
 package com.zancheema.android.telegram.auth.verify
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.Event
+import com.zancheema.android.telegram.data.Result
+import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.AppRepository
+import com.zancheema.android.telegram.data.source.domain.User
+import com.zancheema.android.telegram.util.wrapEspressoIdlingResource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+
+private const val TAG = "VerifyCodeViewModel"
 
 @HiltViewModel
 class VerifyCodeViewModel @Inject constructor(
@@ -21,10 +30,6 @@ class VerifyCodeViewModel @Inject constructor(
     val phoneNumber = MutableLiveData<String>()
     val verificationId = MutableLiveData<String>()
     val smsCode = MutableLiveData<String>()
-
-    private val _verificationEvent = MutableLiveData<Event<AuthCredential>>()
-    val verificationEvent: LiveData<Event<AuthCredential>>
-        get() = _verificationEvent
 
     private val _showChatsEvent = MutableLiveData<Event<Boolean>>()
     val showChatsEvent: LiveData<Event<Boolean>>
@@ -36,21 +41,38 @@ class VerifyCodeViewModel @Inject constructor(
 
     fun verify() {
         viewModelScope.launch {
-            val isRegistered = repository.isRegisteredPhoneNumber(phoneNumber.value!!)
-            if (isRegistered is Success && isRegistered.data) {
-                showChats()
-            } else {
-                _verificationEvent.value =
-                    Event(PhoneAuthProvider.getCredential(verificationId.value!!, smsCode.value!!))
+            repository.isRegisteredPhoneNumber(phoneNumber.value!!).let { isRegistered ->
+                if (isRegistered is Success) {
+                    signIn(isRegistered.data)
+                } else if (isRegistered is Error) {
+                    Log.d(TAG, "verify: error: ${isRegistered.exception}")
+                }
             }
         }
     }
 
-    fun showChats() {
+    private fun signIn(isRegistered: Boolean) {
+        val credential = PhoneAuthProvider.getCredential(verificationId.value!!, smsCode.value!!)
+        viewModelScope.launch {
+            wrapEspressoIdlingResource {
+                try {
+                    val result = Firebase.auth.signInWithCredential(credential).await()
+                    val user = User(result.user!!.phoneNumber!!)
+                    repository.saveUser(user)
+                    if (isRegistered) showChats()
+                    else showRegistration()
+                } catch (e: Exception) {
+                    Log.d(TAG, "signIn: error: $e")
+                }
+            }
+        }
+    }
+
+    private fun showChats() {
         _showChatsEvent.value = Event(true)
     }
 
-    fun showRegistration() {
+    private fun showRegistration() {
         _showRegistrationEvent.value = Event(true)
     }
 }
