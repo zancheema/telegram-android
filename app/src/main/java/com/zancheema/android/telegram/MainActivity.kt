@@ -6,12 +6,14 @@ import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.zancheema.android.telegram.auth.FirebaseUserLiveData
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionChatsFragmentToAuthFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,13 +23,25 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbarMain)
-        val drawerLayout = findViewById<DrawerLayout>(R.id.mainDrawerLayout)
-        val navView = findViewById<NavigationView>(R.id.navView)
-
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
         val navController = navHostFragment.navController
+
+        setUpDrawer(navController)
+
+        /** show login instead of chats of user is not logged in already */
+        if (Firebase.auth.currentUser == null) {
+            navController.navigate(actionChatsFragmentToAuthFragment())
+        }
+    }
+
+    /**
+     * Set up drawer layout with the toolbar
+     */
+    private fun setUpDrawer(navController: NavController) {
+        val toolbar = findViewById<Toolbar>(R.id.toolbarMain)
+        val drawerLayout = findViewById<DrawerLayout>(R.id.mainDrawerLayout)
+        val navView = findViewById<NavigationView>(R.id.navView)
 
         val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
 
@@ -35,13 +49,12 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            toolbar.visibility = if (isAuthDestination(destination.id)) GONE else VISIBLE
-        }
-
-        FirebaseUserLiveData().observe(this) { user ->
-            if (user == null) {
-                navController.navigate(actionChatsFragmentToAuthFragment())
+            val (toolbarVisibility, drawerLockMode) = when (isAuthDestination(destination.id)) {
+                true -> Pair(GONE, DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                else -> Pair(VISIBLE, DrawerLayout.LOCK_MODE_UNLOCKED)
             }
+            toolbar.visibility = toolbarVisibility
+            drawerLayout.setDrawerLockMode(drawerLockMode)
         }
     }
 

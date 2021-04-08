@@ -17,9 +17,22 @@ fun View.showSnackbar(text: String, duration: Int) {
 /**
  * Triggers a snackbar message when the value contained by snackbarTaskMessageLiveEvent is modified.
  */
-fun View.setUpSnackar(
+fun View.setUpSnackbar(
     lifecycleOwner: LifecycleOwner,
     snackbarEvent: LiveData<Event<Int>>,
+    duration: Int
+) {
+    snackbarEvent.observe(lifecycleOwner, EventObserver { resId ->
+        showSnackbar(context.getString(resId), duration)
+    })
+}
+
+/**
+ * Triggers a nullable snackbar message
+ */
+fun View.setUpSnackbarNullable(
+    lifecycleOwner: LifecycleOwner,
+    snackbarEvent: LiveData<Event<Int>?>,
     duration: Int
 ) {
     snackbarEvent.observe(lifecycleOwner, EventObserver { resId ->

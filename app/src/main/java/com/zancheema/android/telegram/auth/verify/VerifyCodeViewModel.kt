@@ -9,7 +9,6 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.Event
-import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.AppRepository
@@ -35,8 +34,8 @@ class VerifyCodeViewModel @Inject constructor(
     val showChatsEvent: LiveData<Event<Boolean>>
         get() = _showChatsEvent
 
-    private val _showRegistrationEvent = MutableLiveData<Event<Boolean>>()
-    val showRegistrationEvent: LiveData<Event<Boolean>>
+    private val _showRegistrationEvent = MutableLiveData<Event<String>>()
+    val showRegistrationEvent: LiveData<Event<String>>
         get() = _showRegistrationEvent
 
     fun verify() {
@@ -60,7 +59,7 @@ class VerifyCodeViewModel @Inject constructor(
                     val user = User(result.user!!.phoneNumber!!)
                     repository.saveUser(user)
                     if (isRegistered) showChats()
-                    else showRegistration()
+                    else showRegistration(user.phoneNumber)
                 } catch (e: Exception) {
                     Log.d(TAG, "signIn: error: $e")
                 }
@@ -72,7 +71,7 @@ class VerifyCodeViewModel @Inject constructor(
         _showChatsEvent.value = Event(true)
     }
 
-    private fun showRegistration() {
-        _showRegistrationEvent.value = Event(true)
+    private fun showRegistration(phoneNumber: String) {
+        _showRegistrationEvent.value = Event(phoneNumber)
     }
 }

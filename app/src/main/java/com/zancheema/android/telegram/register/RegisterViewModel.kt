@@ -7,13 +7,13 @@ import com.zancheema.android.telegram.Event
 import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.UserDetail
-import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ViewModelScoped
+@HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {

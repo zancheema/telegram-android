@@ -7,13 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.EventObserver
 import com.zancheema.android.telegram.auth.verify.VerifyCodeFragmentDirections.Companion.actionVerifyCodeFragmentToRegisterFragment
 import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionGlobalChatsFragment
 import com.zancheema.android.telegram.databinding.VerifyCodeFragmentBinding
-import com.zancheema.android.telegram.util.EspressoIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -39,8 +36,8 @@ class VerifyCodeFragment : Fragment() {
     }
 
     private fun setUpNavigation() {
-        viewModel.showRegistrationEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) findNavController().navigate(actionVerifyCodeFragmentToRegisterFragment())
+        viewModel.showRegistrationEvent.observe(viewLifecycleOwner, EventObserver { phoneNumber ->
+            findNavController().navigate(actionVerifyCodeFragmentToRegisterFragment(phoneNumber))
         })
         viewModel.showChatsEvent.observe(viewLifecycleOwner, EventObserver {
             if (it) findNavController().navigate(actionGlobalChatsFragment())

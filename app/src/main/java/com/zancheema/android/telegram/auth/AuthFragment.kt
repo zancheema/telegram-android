@@ -17,7 +17,7 @@ import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.EventObserver
 import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionAuthFragmentToRegisterFragment
 import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionAuthFragmentToVerifyCodeFragment
-import com.zancheema.android.telegram.util.setUpSnackar
+import com.zancheema.android.telegram.util.setUpSnackbar
 import com.zancheema.android.telegram.databinding.AuthFragmentBinding
 import com.zancheema.android.telegram.util.EspressoIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +53,7 @@ class AuthFragment : Fragment() {
     }
 
     private fun setUpSnackbar() {
-        requireView().setUpSnackar(
+        requireView().setUpSnackbar(
             viewLifecycleOwner,
             viewModel.invalidCredentialsEvent,
             Snackbar.LENGTH_SHORT
@@ -84,7 +84,11 @@ class AuthFragment : Fragment() {
                         .addOnCompleteListener { task ->
                             EspressoIdlingResource.decrement()
                             if (task.isSuccessful) {
-                                findNavController().navigate(actionAuthFragmentToRegisterFragment())
+                                viewModel.phoneNumber.value?.let {
+                                    findNavController().navigate(
+                                        actionAuthFragmentToRegisterFragment(it)
+                                    )
+                                }
                             }
                         }
                 }
