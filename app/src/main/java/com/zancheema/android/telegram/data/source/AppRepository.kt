@@ -10,9 +10,9 @@ interface AppRepository {
 
     fun observeAllUserDetails(): Flow<Result<List<UserDetail>>>
 
-    suspend fun getUserDetail(): Result<UserDetail>
+    suspend fun getUserDetailByPhoneNumber(phoneNumber: String): Result<UserDetail>
 
-    fun observeUserDetail(): LiveData<Result<UserDetail>>
+    fun observeUserDetailByPhoneNumber(phoneNumber: String): LiveData<Result<UserDetail>>
 
     suspend fun getAllChatRooms(): Result<List<ChatRoom>>
 

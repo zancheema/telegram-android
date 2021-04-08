@@ -10,9 +10,8 @@ data class UserDetail(
     val phoneNumber: String,
     val firstName: String,
     val lastName: String,
-    val imgUrl: String = "nothing",
-    val msgToken: String = "nothing",
-    val photoUrl: String = ""
+    val photoUrl: String = "",
+    val msgToken: String = "nothing"
 ) : Parcelable {
     @IgnoredOnParcel
     val fullName = "$firstName $lastName"
@@ -22,5 +21,5 @@ fun UserDetail.asDatabaseEntity() = DbUserDetail(
     phoneNumber = phoneNumber,
     firstName = firstName,
     lastName = lastName,
-    photoUrl = imgUrl
+    photoUrl = photoUrl
 )

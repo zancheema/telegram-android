@@ -12,6 +12,7 @@ import com.zancheema.android.telegram.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,14 +35,13 @@ class FakeRepository @Inject constructor() : AppRepository {
             .map { Success(it) }
     }
 
-    override suspend fun getUserDetail(): Result<UserDetail> {
-        TODO("Not yet implemented")
-//        return observableUserDetail.value?.let {
-//            Success(it)
-//        } ?: Error(Exception("user does not exist"))
+    override suspend fun getUserDetailByPhoneNumber(phoneNumber: String): Result<UserDetail> {
+        val detail = observableUserDetails.value.firstOrNull()
+            ?: return Error(Exception("UserDetail not found"))
+        return Success(detail)
     }
 
-    override fun observeUserDetail(): LiveData<Result<UserDetail>> {
+    override fun observeUserDetailByPhoneNumber(phoneNumber: String): LiveData<Result<UserDetail>> {
         TODO("Not yet implemented")
     }
 
@@ -116,6 +116,9 @@ class FakeRepository @Inject constructor() : AppRepository {
 
     override suspend fun saveUserDetail(detail: UserDetail) = withContext(Dispatchers.Main) {
         val tmp = observableUserDetails.value.toMutableList()
+        observableUsers.value?.let {
+            it.firstOrNull() ?: error("User does not exist for this detail")
+        } ?: error("User does not exist for this detail")
         tmp.add(detail)
         observableUserDetails.value = tmp
     }

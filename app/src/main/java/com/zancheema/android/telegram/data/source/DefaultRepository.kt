@@ -14,11 +14,11 @@ class DefaultRepository : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUserDetail(): Result<UserDetail> {
+    override suspend fun getUserDetailByPhoneNumber(phoneNumber: String): Result<UserDetail> {
         TODO("Not yet implemented")
     }
 
-    override fun observeUserDetail(): LiveData<Result<UserDetail>> {
+    override fun observeUserDetailByPhoneNumber(phoneNumber: String): LiveData<Result<UserDetail>> {
         TODO("Not yet implemented")
     }
 
