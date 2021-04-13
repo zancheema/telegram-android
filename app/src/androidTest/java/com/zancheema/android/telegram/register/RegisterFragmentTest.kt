@@ -86,7 +86,7 @@ class RegisterFragmentTest {
                 .perform(click())
 
             // user detail is saved in repository
-            val userDetail = repository.getUserDetailByPhoneNumber(phoneNumber)
+            val userDetail = repository.getUserDetail(phoneNumber)
             assertThat(userDetail.succeeded, `is`(true))
             userDetail as Success
             assertThat(userDetail.data.phoneNumber, `is`(phoneNumber))

@@ -66,10 +66,10 @@ class ChatViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testPreconditions() = runBlockingTest {
-        val userDetails = repository.observeAllUserDetails().first()
+        val userDetails = repository.observeUserDetails().first()
         assertThat((userDetails as Success).data, `is`(listOf(sender, receiver)))
 
-        val chatMessages = repository.observeAllChatMessages().first()
+        val chatMessages = repository.observeChatMessages().first()
         assertThat((chatMessages as Success).data, `is`(emptyList()))
     }
 

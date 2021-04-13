@@ -6,41 +6,67 @@ import com.zancheema.android.telegram.data.source.domain.*
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {
-    suspend fun getAllUserDetails(): Result<List<UserDetail>>
+    fun observeUsers(): Flow<Result<List<User>>>
 
-    fun observeAllUserDetails(): Flow<Result<List<UserDetail>>>
+    suspend fun getUsers(): Result<List<User>>
 
-    suspend fun getUserDetailByPhoneNumber(phoneNumber: String): Result<UserDetail>
+    suspend fun refreshUsers(phoneNumber: String)
 
-    fun observeUserDetailByPhoneNumber(phoneNumber: String): LiveData<Result<UserDetail>>
+    fun observeUserDetails(): Flow<Result<List<UserDetail>>>
 
-    suspend fun getAllChatRooms(): Result<List<ChatRoom>>
+    suspend fun getUserDetails(forceUpdate: Boolean = false): Result<List<UserDetail>>
 
-    suspend fun getChatRoomById(id: String): Result<ChatRoom>
+    suspend fun refreshUserDetails()
 
-    suspend fun getAllChats(): Result<List<Chat>>
+    fun observeUserDetail(phoneNumber: String): LiveData<Result<UserDetail>>
 
-    suspend fun getAllChatMessages(): Result<List<ChatMessage>>
+    suspend fun getUserDetail(
+        phoneNumber: String,
+        forceUpdate: Boolean = false
+    ): Result<UserDetail>
 
-    suspend fun getChatMessagesByChatRoomId(id: String): Result<List<ChatMessage>>
+    suspend fun refreshUserDetail(phoneNumber: String)
 
-    suspend fun getChatMessageById(id: String): Result<ChatMessage>
+    fun observeChatRooms(): Flow<Result<List<ChatRoom>>>
 
-    fun observeAllChatRooms(): Flow<Result<List<ChatRoom>>>
+    suspend fun getChatRooms(forceUpdate: Boolean = false): Result<List<ChatRoom>>
 
-    fun observeChatRoomById(id: String): Flow<Result<ChatRoom>>
+    suspend fun refreshChatRooms()
 
-    fun observeAllChats(): Flow<Result<List<Chat>>>
+    fun observeChatRoom(id: String): Flow<Result<ChatRoom>>
 
-    fun observeAllChatMessages(): Flow<Result<List<ChatMessage>>>
+    suspend fun getChatRoom(id: String, forceUpdate: Boolean = false): Result<ChatRoom>
 
-    fun observeChatMessagesByChatRoomId(id: String): Flow<Result<List<ChatMessage>>>
+    suspend fun refreshChatRoom(id: String)
 
-    fun observeChatMessageById(id: String): Flow<Result<ChatMessage>>
+    fun observeChats(): Flow<Result<List<Chat>>>
 
-    suspend fun isRegisteredPhoneNumber(phoneNumber: String): Result<Boolean>
+    suspend fun getChats(forceUpdate: Boolean = false): Result<List<Chat>>
 
-    fun observeUserExists(): LiveData<Result<Boolean>>
+    suspend fun refreshChats()
+
+    fun observeChatMessages(): Flow<Result<List<ChatMessage>>>
+
+    suspend fun getChatMessages(forceUpdate: Boolean = false): Result<List<ChatMessage>>
+
+    suspend fun refreshChatMessages()
+
+    fun observeChatMessages(chatRoomId: String): Flow<Result<List<ChatMessage>>>
+
+    suspend fun getChatMessages(
+        chatRoomId: String,
+        forceUpdate: Boolean = false
+    ): Result<List<ChatMessage>>
+
+    suspend fun refreshChatMessages(chatRoomId: String)
+
+    fun observeChatMessage(id: String): Flow<Result<ChatMessage>>
+
+    suspend fun getChatMessage(id: String, forceUpdate: Boolean = false): Result<ChatMessage>
+
+    suspend fun refreshChatMessage(id: String)
+
+    suspend fun isRegistered(phoneNumber: String, forceUpdate: Boolean = false): Result<Boolean>
 
     suspend fun saveUser(user: User)
 
@@ -52,19 +78,23 @@ interface AppRepository {
 
     suspend fun deleteAllUsers()
 
+    suspend fun deleteUser(phoneNumber: String)
+
     suspend fun deleteAllUserDetails()
+
+    suspend fun deleteUserDetail(phoneNumber: String)
 
     suspend fun deleteAllChatRooms()
 
     suspend fun deleteChatRoom(room: ChatRoom)
 
-    suspend fun deleteChatRoomById(id: String)
+    suspend fun deleteChatRoom(id: String)
 
     suspend fun deleteAllChatMessages()
 
-    suspend fun deleteChatMessagesByChatRoomId(id: String)
+    suspend fun deleteChatMessages(chatRoomId: String)
 
     suspend fun deleteChatMessage(message: ChatMessage)
 
-    suspend fun deleteChatMessageById(id: String)
+    suspend fun deleteChatMessage(id: String)
 }

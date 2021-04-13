@@ -40,7 +40,7 @@ class VerifyCodeViewModel @Inject constructor(
 
     fun verify() {
         viewModelScope.launch {
-            repository.isRegisteredPhoneNumber(phoneNumber.value!!).let { isRegistered ->
+            repository.isRegistered(phoneNumber.value!!).let { isRegistered ->
                 if (isRegistered is Success) {
                     signIn(isRegistered.data)
                 } else if (isRegistered is Error) {

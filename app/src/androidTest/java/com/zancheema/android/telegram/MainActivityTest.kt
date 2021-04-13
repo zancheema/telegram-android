@@ -133,7 +133,7 @@ class MainActivityTest {
                 .check(matches(isDisplayed()))
 
             // check the user is saved in repository
-            val user = repository.isRegisteredPhoneNumber("+1$phoneNumber")
+            val user = repository.isRegistered("+1$phoneNumber")
             assertThat(user.succeeded, `is`(true))
             assertThat((user as Result.Success).data, `is`(true))
 

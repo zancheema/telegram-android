@@ -113,7 +113,7 @@ class ChatMessageDaoTest {
         val chatMessage = DbChatMessage("msg_1", chatRoom1.id, "Hello")
         database.chatMessageDao().insert(chatMessage)
 
-        val updatedChatMessage = DbChatMessage("msg_1", chatRoom1.id, "Hello")
+        val updatedChatMessage = chatMessage.copy(message = "Hey")
         database.chatMessageDao().insert(updatedChatMessage)
 
         val loaded = database.chatMessageDao().getById(chatMessage.id)

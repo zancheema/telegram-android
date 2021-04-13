@@ -35,7 +35,7 @@ class ChatViewModel @Inject constructor(
             .flatMapConcat { chat ->
                 try {
                     checkNotNull(chat)
-                    repository.observeChatMessagesByChatRoomId(chat.chatRoomId)
+                    repository.observeChatMessages(chat.chatRoomId)
                 } catch (e: Exception) {
                     _invalidChatEvent.value = Event(R.string.invalid_chat)
                     flowOf(Error(e))

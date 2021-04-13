@@ -58,7 +58,7 @@ class RegisterViewModelTest {
         val event = viewModel.messageText.first()
         assertThat(event?.getContentIfNotHandled(), `is`(R.string.invalid_phone_number))
         assertThat(
-            repository.getUserDetailByPhoneNumber(phoneNumber),
+            repository.getUserDetail(phoneNumber),
             instanceOf(Error::class.java)
         )
     }
@@ -75,7 +75,7 @@ class RegisterViewModelTest {
         val event = viewModel.messageText.first()
         assertThat(event?.getContentIfNotHandled(), `is`(R.string.empty_first_name))
         assertThat(
-            repository.getUserDetailByPhoneNumber(phoneNumber),
+            repository.getUserDetail(phoneNumber),
             instanceOf(Error::class.java)
         )
     }
@@ -92,7 +92,7 @@ class RegisterViewModelTest {
         viewModel.saveUserDetail()
 
         // user detail is still saved, if the lastName is not provided
-        val userDetail = repository.getUserDetailByPhoneNumber(phoneNumber)
+        val userDetail = repository.getUserDetail(phoneNumber)
         assertThat(userDetail.succeeded, `is`(true))
         userDetail as Success
         assertThat(userDetail.data.phoneNumber, `is`(phoneNumber))
@@ -116,7 +116,7 @@ class RegisterViewModelTest {
         viewModel.lastName.value = lastName
         viewModel.saveUserDetail()
 
-        val userDetail = repository.getUserDetailByPhoneNumber(phoneNumber)
+        val userDetail = repository.getUserDetail(phoneNumber)
         assertThat(userDetail.succeeded, `is`(true))
         userDetail as Success
         assertThat(userDetail.data.phoneNumber, `is`(phoneNumber))

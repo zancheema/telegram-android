@@ -2,7 +2,6 @@ package com.zancheema.android.telegram.source
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
@@ -19,84 +18,133 @@ import javax.inject.Singleton
 @Singleton
 class FakeRepository @Inject constructor() : AppRepository {
 
-    private val observableUser = MutableLiveData<User>(null)
     private val observableUsers = MutableLiveData<List<User>>(emptyList())
-
     private var observableUserDetails = MutableStateFlow<List<UserDetail>>(emptyList())
     private val observableChatRooms = MutableStateFlow<List<ChatRoom>>(emptyList())
     private val observableChatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
-
-    override suspend fun getAllUserDetails(): Result<List<UserDetail>> {
+    override suspend fun refreshUserDetails() {
         TODO("Not yet implemented")
     }
 
-    override fun observeAllUserDetails(): Flow<Result<List<UserDetail>>> {
+    override suspend fun refreshUserDetail(phoneNumber: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshChatMessage(id: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun observeUsers(): Flow<Result<List<User>>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUsers(): Result<List<User>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshUsers(phoneNumber: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteUser(phoneNumber: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteUserDetail(phoneNumber: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshChatRooms() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshChatRoom(id: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshChats() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshChatMessages() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshChatMessages(chatRoomId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUserDetails(forceUpdate: Boolean): Result<List<UserDetail>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun observeUserDetails(): Flow<Result<List<UserDetail>>> {
         return observableUserDetails
             .map { Success(it) }
     }
 
-    override suspend fun getUserDetailByPhoneNumber(phoneNumber: String): Result<UserDetail> {
+    override suspend fun getUserDetail(phoneNumber: String, forceUpdate: Boolean): Result<UserDetail> {
         val detail = observableUserDetails.value.firstOrNull()
             ?: return Error(Exception("UserDetail not found"))
         return Success(detail)
     }
 
-    override fun observeUserDetailByPhoneNumber(phoneNumber: String): LiveData<Result<UserDetail>> {
+    override fun observeUserDetail(phoneNumber: String): LiveData<Result<UserDetail>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAllChatRooms(): Result<List<ChatRoom>> {
+    override suspend fun getChatRooms(forceUpdate: Boolean): Result<List<ChatRoom>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatRoomById(id: String): Result<ChatRoom> {
+    override suspend fun getChatRoom(id: String, forceUpdate: Boolean): Result<ChatRoom> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAllChats(): Result<List<Chat>> {
+    override suspend fun getChats(forceUpdate: Boolean): Result<List<Chat>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAllChatMessages(): Result<List<ChatMessage>> {
+    override suspend fun getChatMessages(forceUpdate: Boolean): Result<List<ChatMessage>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatMessagesByChatRoomId(id: String): Result<List<ChatMessage>> {
+    override suspend fun getChatMessages(chatRoomId: String, forceUpdate: Boolean): Result<List<ChatMessage>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatMessageById(id: String): Result<ChatMessage> {
+    override suspend fun getChatMessage(id: String, forceUpdate: Boolean): Result<ChatMessage> {
         TODO("Not yet implemented")
     }
 
-    override fun observeAllChatRooms(): Flow<Result<List<ChatRoom>>> {
+    override fun observeChatRooms(): Flow<Result<List<ChatRoom>>> {
         TODO("Not yet implemented")
     }
 
-    override fun observeChatRoomById(id: String): Flow<Result<ChatRoom>> {
+    override fun observeChatRoom(id: String): Flow<Result<ChatRoom>> {
         TODO("Not yet implemented")
     }
 
-    override fun observeAllChats(): Flow<Result<List<Chat>>> {
+    override fun observeChats(): Flow<Result<List<Chat>>> {
         TODO("Not yet implemented")
     }
 
-    override fun observeAllChatMessages(): Flow<Result<List<ChatMessage>>> {
+    override fun observeChatMessages(): Flow<Result<List<ChatMessage>>> {
         return observableChatMessages.map { Success(it) }
     }
 
-    override fun observeChatMessagesByChatRoomId(id: String): Flow<Result<List<ChatMessage>>> {
+    override fun observeChatMessages(chatRoomId: String): Flow<Result<List<ChatMessage>>> {
         return observableChatMessages
             .map { messages ->
-                Success(messages.filter { it.chatRoomId == id })
+                Success(messages.filter { it.chatRoomId == chatRoomId })
             }
     }
 
-    override fun observeChatMessageById(id: String): Flow<Result<ChatMessage>> {
+    override fun observeChatMessage(id: String): Flow<Result<ChatMessage>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun isRegisteredPhoneNumber(phoneNumber: String): Result<Boolean> {
+    override suspend fun isRegistered(phoneNumber: String, forceUpdate: Boolean): Result<Boolean> {
         wrapEspressoIdlingResource {
             for (u in observableUsers.value!!) {
                 if (u.phoneNumber == phoneNumber) return Success(true)
@@ -105,12 +153,7 @@ class FakeRepository @Inject constructor() : AppRepository {
         }
     }
 
-    override fun observeUserExists(): LiveData<Result<Boolean>> =
-        observableUser.map { Success(it != null) }
-
     override suspend fun saveUser(user: User) = withContext(Dispatchers.Main) {
-        // save user
-        observableUser.value = user
         observableUsers.value = observableUsers.value!!.toMutableList().apply { add(user) }
     }
 
@@ -151,7 +194,7 @@ class FakeRepository @Inject constructor() : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteChatRoomById(id: String) {
+    override suspend fun deleteChatRoom(id: String) {
         TODO("Not yet implemented")
     }
 
@@ -159,7 +202,7 @@ class FakeRepository @Inject constructor() : AppRepository {
         observableChatMessages.value = emptyList()
     }
 
-    override suspend fun deleteChatMessagesByChatRoomId(id: String) {
+    override suspend fun deleteChatMessages(chatRoomId: String) {
         TODO("Not yet implemented")
     }
 
@@ -167,7 +210,7 @@ class FakeRepository @Inject constructor() : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteChatMessageById(id: String) {
+    override suspend fun deleteChatMessage(id: String) {
         TODO("Not yet implemented")
     }
 }
