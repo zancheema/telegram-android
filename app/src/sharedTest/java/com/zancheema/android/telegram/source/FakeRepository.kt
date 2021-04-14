@@ -1,7 +1,6 @@
 package com.zancheema.android.telegram.source
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
@@ -9,29 +8,47 @@ import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.*
 import com.zancheema.android.telegram.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FakeRepository @Inject constructor() : AppRepository {
 
-    private val observableUsers = MutableLiveData<List<User>>(emptyList())
+    private val observableUsers = MutableStateFlow<List<User>>(emptyList())
     private var observableUserDetails = MutableStateFlow<List<UserDetail>>(emptyList())
     private val observableChatRooms = MutableStateFlow<List<ChatRoom>>(emptyList())
     private val observableChatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
+
+    private val usersServiceData = LinkedHashMap<String, User>()
+    private val userDetailsServiceData = LinkedHashMap<String, UserDetail>()
+    private val chatRoomsServiceData = LinkedHashMap<String, ChatRoom>()
+    private val chatMessagesServiceData = LinkedHashMap<String, ChatMessage>()
+
     override suspend fun refreshUserDetails() {
-        TODO("Not yet implemented")
+        observableUserDetails.value = userDetailsServiceData.values.toList()
     }
 
     override suspend fun refreshUserDetail(phoneNumber: String) {
-        TODO("Not yet implemented")
+        val tmp = observableUserDetails.value.toMutableList()
+        tmp.removeIf { it.phoneNumber == phoneNumber }
+        userDetailsServiceData[phoneNumber]?.let {
+            tmp.add(it)
+        }
+        observableUserDetails.value = tmp
     }
 
     override suspend fun refreshChatMessage(id: String) {
-        TODO("Not yet implemented")
+        val tmp = observableChatMessages.value.toMutableList()
+        tmp.removeIf { it.id == id }
+        chatMessagesServiceData[id]?.let {
+            tmp.add(it)
+        }
+        observableChatMessages.value = tmp
     }
 
     override fun observeUsers(): Flow<Result<List<User>>> {
@@ -42,8 +59,17 @@ class FakeRepository @Inject constructor() : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun refreshUsers(phoneNumber: String) {
-        TODO("Not yet implemented")
+    override suspend fun refreshUser(phoneNumber: String) {
+        val tmp = observableUsers.value.toMutableList()
+        tmp.removeIf { it.phoneNumber == phoneNumber }
+        usersServiceData[phoneNumber]?.let {
+            tmp.add(it)
+        }
+        observableUsers.value = tmp
+    }
+
+    override suspend fun refreshUsers() {
+        observableUsers.value = usersServiceData.values.toList()
     }
 
     override suspend fun deleteUser(phoneNumber: String) {
@@ -54,12 +80,36 @@ class FakeRepository @Inject constructor() : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun refreshChatRooms() {
+    override fun observeUserDetails(phoneNumbers: List<String>): Flow<Result<List<UserDetail>>> {
+        runBlocking {
+            refreshUsers()
+            refreshUserDetails()
+        }
+        return observableUserDetails
+            .map { details ->
+                val filtered = details.filter { phoneNumbers.contains(it.phoneNumber) }
+                Success(filtered)
+            }
+    }
+
+    override suspend fun getUserDetails(
+        phoneNumbers: List<String>,
+        forceUpdate: Boolean
+    ): Result<List<UserDetail>> {
         TODO("Not yet implemented")
     }
 
+    override suspend fun refreshChatRooms() {
+        observableChatRooms.value = chatRoomsServiceData.values.toList()
+    }
+
     override suspend fun refreshChatRoom(id: String) {
-        TODO("Not yet implemented")
+        val tmp = observableChatRooms.value.toMutableList()
+        tmp.removeIf { it.id == id }
+        chatRoomsServiceData[id]?.let {
+            tmp.add(it)
+        }
+        observableChatRooms.value = tmp
     }
 
     override suspend fun refreshChats() {
@@ -67,11 +117,15 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override suspend fun refreshChatMessages() {
-        TODO("Not yet implemented")
+        observableChatMessages.value = chatMessagesServiceData.values.toList()
     }
 
     override suspend fun refreshChatMessages(chatRoomId: String) {
-        TODO("Not yet implemented")
+        val tmp = observableChatMessages.value.toMutableList()
+        tmp.removeIf { it.chatRoomId == chatRoomId }
+        val newMessages = chatMessagesServiceData.values.filter { it.chatRoomId == chatRoomId }
+        tmp.addAll(newMessages)
+        observableChatMessages.value = tmp
     }
 
     override suspend fun getUserDetails(forceUpdate: Boolean): Result<List<UserDetail>> {
@@ -79,14 +133,18 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override fun observeUserDetails(): Flow<Result<List<UserDetail>>> {
+        runBlocking { refreshUserDetails() }
         return observableUserDetails
             .map { Success(it) }
     }
 
-    override suspend fun getUserDetail(phoneNumber: String, forceUpdate: Boolean): Result<UserDetail> {
-        val detail = observableUserDetails.value.firstOrNull()
-            ?: return Error(Exception("UserDetail not found"))
-        return Success(detail)
+    override suspend fun getUserDetail(
+        phoneNumber: String,
+        forceUpdate: Boolean
+    ): Result<UserDetail> {
+        userDetailsServiceData[phoneNumber]?.let {
+            return Success(it)
+        } ?: return Error(Exception("UserDetail not found"))
     }
 
     override fun observeUserDetail(phoneNumber: String): LiveData<Result<UserDetail>> {
@@ -109,7 +167,10 @@ class FakeRepository @Inject constructor() : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatMessages(chatRoomId: String, forceUpdate: Boolean): Result<List<ChatMessage>> {
+    override suspend fun getChatMessages(
+        chatRoomId: String,
+        forceUpdate: Boolean
+    ): Result<List<ChatMessage>> {
         TODO("Not yet implemented")
     }
 
@@ -130,10 +191,12 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override fun observeChatMessages(): Flow<Result<List<ChatMessage>>> {
+        runBlocking { refreshChatMessages() }
         return observableChatMessages.map { Success(it) }
     }
 
     override fun observeChatMessages(chatRoomId: String): Flow<Result<List<ChatMessage>>> {
+        runBlocking { refreshChatMessages(chatRoomId) }
         return observableChatMessages
             .map { messages ->
                 Success(messages.filter { it.chatRoomId == chatRoomId })
@@ -146,7 +209,8 @@ class FakeRepository @Inject constructor() : AppRepository {
 
     override suspend fun isRegistered(phoneNumber: String, forceUpdate: Boolean): Result<Boolean> {
         wrapEspressoIdlingResource {
-            for (u in observableUsers.value!!) {
+            if (forceUpdate) refreshUserDetail(phoneNumber)
+            for (u in observableUserDetails.value) {
                 if (u.phoneNumber == phoneNumber) return Success(true)
             }
             return Success(false)
@@ -154,28 +218,20 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override suspend fun saveUser(user: User) = withContext(Dispatchers.Main) {
-        observableUsers.value = observableUsers.value!!.toMutableList().apply { add(user) }
+        usersServiceData[user.phoneNumber] = user
     }
 
     override suspend fun saveUserDetail(detail: UserDetail) = withContext(Dispatchers.Main) {
-        val tmp = observableUserDetails.value.toMutableList()
-        observableUsers.value?.let {
-            it.firstOrNull() ?: error("User does not exist for this detail")
-        } ?: error("User does not exist for this detail")
-        tmp.add(detail)
-        observableUserDetails.value = tmp
+        userDetailsServiceData[detail.phoneNumber] = detail
     }
 
     override suspend fun saveChatMessage(message: ChatMessage) {
-        val tmp = observableChatMessages.value.toMutableList()
-        tmp.add(message)
-        observableChatMessages.value = tmp
+        chatMessagesServiceData[message.id] = message
+        runBlocking { refreshChatMessages() } // to keep chat messages always realtime
     }
 
     override suspend fun saveChatRoom(room: ChatRoom) {
-        val tmp = observableChatRooms.value.toMutableList()
-        tmp.add(room)
-        observableChatRooms.value = tmp
+        chatRoomsServiceData[room.id] = room
     }
 
     override suspend fun deleteAllUsers() {

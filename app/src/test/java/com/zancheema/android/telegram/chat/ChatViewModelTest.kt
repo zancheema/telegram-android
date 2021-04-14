@@ -101,8 +101,8 @@ class ChatViewModelTest {
 
         val messages = listOf(
             ChatMessage("msg_1", chat.chatRoomId, "Hello"),
-            ChatMessage("msg_1", chat.chatRoomId, "Hey", isMine = false),
-            ChatMessage("msg_1", chat.chatRoomId, "How's it going?")
+            ChatMessage("msg_2", chat.chatRoomId, "Hey", isMine = false),
+            ChatMessage("msg_3", chat.chatRoomId, "How's it going?")
         )
         messages.forEach { repository.saveChatMessage(it) }
 

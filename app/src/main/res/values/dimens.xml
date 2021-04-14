@@ -20,4 +20,5 @@
     <dimen name="corner_radius_round_chat_message">8dp</dimen>
     <dimen name="none">0dp</dimen>
     <dimen name="max_width_chat_message">240dp</dimen>
+    <dimen name="size_image_view_list_item">50dp</dimen>
 </resources>

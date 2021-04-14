@@ -50,7 +50,11 @@ class DefaultRepository : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun refreshUsers(phoneNumber: String) {
+    override suspend fun refreshUsers() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshUser(phoneNumber: String) {
         TODO("Not yet implemented")
     }
 
@@ -59,6 +63,17 @@ class DefaultRepository : AppRepository {
     }
 
     override suspend fun deleteUserDetail(phoneNumber: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun observeUserDetails(phoneNumbers: List<String>): Flow<Result<List<UserDetail>>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUserDetails(
+        phoneNumbers: List<String>,
+        forceUpdate: Boolean
+    ): Result<List<UserDetail>> {
         TODO("Not yet implemented")
     }
 

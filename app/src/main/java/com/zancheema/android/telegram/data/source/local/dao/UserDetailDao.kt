@@ -5,8 +5,11 @@ import com.zancheema.android.telegram.data.source.local.entity.DbUserDetail
 
 @Dao
 interface UserDetailDao {
+    @Query("SELECT * FROM user_details WHERE phone_number IN (:phoneNumbers)")
+    suspend fun getUserDetailsByPhoneNumbers(phoneNumbers: List<String>): List<DbUserDetail>
+
     @Query("SELECT * FROM user_details WHERE phone_number = :phoneNumber")
-    suspend fun getUserDetailByPhoneNumber(phoneNumber: String): DbUserDetail?
+    suspend fun getUserDetailByPhoneNumber(vararg phoneNumber: String): DbUserDetail?
 
     /**
      * Inserts new [DbUserDetail] and replaces with the new one in case of duplication

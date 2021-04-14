@@ -14,13 +14,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.source.domain.User
+import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.data.succeeded
 import com.zancheema.android.telegram.di.AppRepositoryModule
 import com.zancheema.android.telegram.source.FakeRepository
-import com.zancheema.android.telegram.util.DataBindingIdlingResource
-import com.zancheema.android.telegram.util.EspressoIdlingResource
-import com.zancheema.android.telegram.util.monitorActivity
-import com.zancheema.android.telegram.util.saveUserBlocking
+import com.zancheema.android.telegram.util.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
@@ -91,7 +89,7 @@ class MainActivityTest {
     }
 
     @Test
-    fun authenticateUserWithValidUnregisteredCredentials_NavigatesToRegisterFragment() =
+    fun authenticateUserWithValidUnregisteredCredentials_DisplaysRegisterFragment() =
         runBlocking {
             val countryName = "United States"
             val phoneNumber = "7455551234"
@@ -132,23 +130,21 @@ class MainActivityTest {
             onView(withId(R.id.registerFragmentLayout))
                 .check(matches(isDisplayed()))
 
-            // check the user is saved in repository
-            val user = repository.isRegistered("+1$phoneNumber")
-            assertThat(user.succeeded, `is`(true))
-            assertThat((user as Result.Success).data, `is`(true))
-
             // close activity
             activityScenario.close()
         }
 
     @Test
-    fun authenticateUserWithAlreadyRegisteredCredentials_ShowsChatsFragment() {
+    fun authenticateUserWithAlreadyRegisteredCredentials_DisplaysChatsFragment() {
         val countryName = "United States"
         val phoneNumber = "7455551234"
         val smsCode = "426800"
         val settings = Firebase.auth.firebaseAuthSettings
         // already register the user
-        repository.saveUserBlocking(User("+1$phoneNumber"))
+        val user = User("+1$phoneNumber")
+        val userDetail = UserDetail(user.phoneNumber, "John", "Doe")
+        repository.saveUserBlocking(user)
+        repository.saveUserDetailBlocking(userDetail)
         // Turn off phone auth app verification.
         settings.setAppVerificationDisabledForTesting(true)
         val activityScenario = ActivityScenario.launch(MainActivity::class.java)

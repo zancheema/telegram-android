@@ -64,6 +64,17 @@ class UserDetailDaoTest {
 
     @ExperimentalCoroutinesApi
     @Test
+    fun insertAndGetUserDetailsOfSpecifiedPhoneNumbers() = runBlockingTest {
+        val userDetail = DbUserDetail(user.phoneNumber, "John", "Doe", "https://example.com")
+        database.userDetailDao().insertUserDetail(userDetail)
+
+        val loaded =
+            database.userDetailDao().getUserDetailsByPhoneNumbers(listOf(userDetail.phoneNumber))
+        assertThat(loaded[0], `is`(userDetail))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
     fun insertingDetailAgainForSameUserReplacesPreviousDetail() = runBlockingTest {
         val oldUserDetail = DbUserDetail(user.phoneNumber, "John", "Doe", "https://example.com")
         database.userDetailDao().insertUserDetail(oldUserDetail)   // first insert
