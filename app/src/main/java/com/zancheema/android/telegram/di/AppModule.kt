@@ -2,8 +2,8 @@ package com.zancheema.android.telegram.di
 
 import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.DefaultRepository
-import com.zancheema.android.telegram.data.source.domain.AppContentProvider
-import com.zancheema.android.telegram.data.source.domain.DefaultContentProvider
+import com.zancheema.android.telegram.data.source.AppContentProvider
+import com.zancheema.android.telegram.data.source.DefaultContentProvider
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

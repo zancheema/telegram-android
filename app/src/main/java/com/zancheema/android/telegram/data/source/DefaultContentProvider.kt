@@ -1,4 +1,4 @@
-package com.zancheema.android.telegram.data.source.domain
+package com.zancheema.android.telegram.data.source
 
 import android.content.ContentResolver
 import android.provider.ContactsContract

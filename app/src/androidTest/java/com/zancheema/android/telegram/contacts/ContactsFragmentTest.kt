@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.rule.GrantPermissionRule
 import com.zancheema.android.telegram.R
-import com.zancheema.android.telegram.data.source.domain.AppContentProvider
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.di.AppRepositoryModule

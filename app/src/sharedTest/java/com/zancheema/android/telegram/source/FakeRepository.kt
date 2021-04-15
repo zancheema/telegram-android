@@ -29,6 +29,12 @@ class FakeRepository @Inject constructor() : AppRepository {
     private val chatRoomsServiceData = LinkedHashMap<String, ChatRoom>()
     private val chatMessagesServiceData = LinkedHashMap<String, ChatMessage>()
 
+    private val observableChats = MutableStateFlow<List<Chat>>(emptyList())
+
+    fun setChats(chats: List<Chat>) {
+        observableChats.value = chats
+    }
+
     override suspend fun refreshUserDetails() {
         observableUserDetails.value = userDetailsServiceData.values.toList()
     }
@@ -203,7 +209,7 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override fun observeChats(): Flow<Result<List<Chat>>> {
-        TODO("Not yet implemented")
+        return observableChats.map { Success(it) }
     }
 
     override fun observeChatMessages(): Flow<Result<List<ChatMessage>>> {

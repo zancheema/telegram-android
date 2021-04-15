@@ -9,6 +9,6 @@ data class Chat(
     val photoUrl: String,
     val userName: String,
     val phoneNumber: String,
-    val recentMessage: String = "",
+    val recentMessage: String,
     val timestamp: Long = System.currentTimeMillis()
 ) : Parcelable

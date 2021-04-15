@@ -33,7 +33,7 @@ class ChatFragmentTest {
     private val sender = UserDetail("+13434589734", "John", "Doe")
     private val receiver = UserDetail("+32579459634", "John", "Doe")
     private val chat =
-        Chat("chat_room", "http://example.com", receiver.firstName, receiver.phoneNumber)
+        Chat("chat_room", "http://example.com", receiver.firstName, receiver.phoneNumber, "")
 
     @Inject
     lateinit var repository: FakeRepository

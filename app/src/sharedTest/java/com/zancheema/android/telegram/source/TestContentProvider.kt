@@ -1,7 +1,7 @@
 package com.zancheema.android.telegram.source
 
 import android.content.ContentResolver
-import com.zancheema.android.telegram.data.source.domain.AppContentProvider
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 

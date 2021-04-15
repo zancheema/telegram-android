@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
-import com.zancheema.android.telegram.data.source.domain.AppContentProvider
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.databinding.ContactsFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
