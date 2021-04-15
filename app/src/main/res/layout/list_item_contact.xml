@@ -21,6 +21,7 @@
             android:layout_height="@dimen/size_image_view_list_item"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:photo_url="@{userDetail.photoUrl}"
             app:srcCompat="@drawable/ic_baseline_person_24" />
 
         <TextView

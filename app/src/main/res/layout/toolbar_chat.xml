@@ -20,7 +20,7 @@
 
             <com.mikhaellopez.circularimageview.CircularImageView
                 android:id="@+id/ivChat"
-                app:profile_image_url="@{chat.photoUrl}"
+                app:photo_url="@{chat.photoUrl}"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:scaleType="fitCenter"
