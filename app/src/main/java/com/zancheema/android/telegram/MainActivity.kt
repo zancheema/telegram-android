@@ -15,10 +15,16 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionChatsFragmentToAuthFragment
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var contentProvider: AppContentProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -30,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         setUpDrawer(navController)
 
         /** show login instead of chats of user is not logged in already */
-        if (Firebase.auth.currentUser == null) {
+        if (!contentProvider.isLoggedIn()) {
             navController.navigate(actionChatsFragmentToAuthFragment())
         }
     }

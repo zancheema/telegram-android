@@ -9,8 +9,13 @@ import javax.inject.Singleton
 class TestContentProvider @Inject constructor() : AppContentProvider {
 
     var phoneNumbers: List<String> = emptyList()
+    var loggedIn: Boolean = false
 
     override fun getContactPhoneNumbers(contentResolver: ContentResolver): List<String> {
         return phoneNumbers
+    }
+
+    override fun isLoggedIn(): Boolean {
+        return loggedIn
     }
 }

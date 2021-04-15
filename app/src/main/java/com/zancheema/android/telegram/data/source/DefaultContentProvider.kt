@@ -2,6 +2,8 @@ package com.zancheema.android.telegram.data.source
 
 import android.content.ContentResolver
 import android.provider.ContactsContract
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,5 +32,9 @@ class DefaultContentProvider @Inject constructor() : AppContentProvider {
         cursor?.close()
 
         return numbers
+    }
+
+    override fun isLoggedIn(): Boolean {
+        return Firebase.auth.currentUser != null
     }
 }

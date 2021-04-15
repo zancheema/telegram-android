@@ -12,10 +12,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
-import com.zancheema.android.telegram.data.succeeded
 import com.zancheema.android.telegram.di.AppRepositoryModule
 import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.*
@@ -24,7 +22,6 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
-import org.hamcrest.CoreMatchers.`is`
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -177,7 +174,7 @@ class MainActivityTest {
             .perform(click())
 
         // check ChatsFragment is displayed (user already registered)
-        onView(withId(R.id.chatsFragmentLayout))
+        onView(withId(R.id.chatsLayout))
             .check(matches(isDisplayed()))
 
         // close activity
