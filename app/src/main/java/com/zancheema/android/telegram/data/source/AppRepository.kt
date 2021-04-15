@@ -12,11 +12,15 @@ interface AppRepository {
 
     suspend fun refreshUsers()
 
+    suspend fun refreshUsers(phoneNumbers: List<String>)
+
     suspend fun refreshUser(phoneNumber: String)
 
     fun observeUserDetails(): Flow<Result<List<UserDetail>>>
 
     suspend fun getUserDetails(forceUpdate: Boolean = false): Result<List<UserDetail>>
+
+    suspend fun refreshUserDetails()
 
     fun observeUserDetails(phoneNumbers: List<String>): Flow<Result<List<UserDetail>>>
 
@@ -25,7 +29,7 @@ interface AppRepository {
         forceUpdate: Boolean = false
     ): Result<List<UserDetail>>
 
-    suspend fun refreshUserDetails()
+    suspend fun refreshUserDetails(phoneNumbers: List<String>)
 
     fun observeUserDetail(phoneNumber: String): LiveData<Result<UserDetail>>
 

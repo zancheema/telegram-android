@@ -1,6 +1,7 @@
 package com.zancheema.android.telegram.contacts
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.UserDetail
@@ -10,11 +11,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ContactsViewModel @Inject constructor(
-    repository: AppRepository
+    private val repository: AppRepository
 ) : ViewModel() {
     private val contactNumbers = MutableStateFlow<List<String>>(emptyList())
 
@@ -32,6 +34,10 @@ class ContactsViewModel @Inject constructor(
             }
 
     fun setContactNumbers(phoneNumbers: List<String>) {
+        viewModelScope.launch {
+            repository.refreshUsers(phoneNumbers)
+            repository.refreshUserDetails(phoneNumbers)
+        }
         contactNumbers.value = phoneNumbers
     }
 }

@@ -21,4 +21,5 @@
     <dimen name="none">0dp</dimen>
     <dimen name="max_width_chat_message">240dp</dimen>
     <dimen name="size_image_view_list_item">50dp</dimen>
+    <dimen name="height_divider">1dp</dimen>
 </resources>

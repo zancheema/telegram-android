@@ -2,6 +2,9 @@ package com.zancheema.android.telegram.di
 
 import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.DefaultRepository
+import com.zancheema.android.telegram.data.source.domain.AppContentProvider
+import com.zancheema.android.telegram.data.source.domain.DefaultContentProvider
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,4 +19,12 @@ object AppRepositoryModule {
     fun provideAppRepository(): AppRepository {
         return DefaultRepository()
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class AppContentProviderModule {
+    @Singleton
+    @Binds
+    abstract fun provideTestContentProvider(provider: DefaultContentProvider): AppContentProvider
 }

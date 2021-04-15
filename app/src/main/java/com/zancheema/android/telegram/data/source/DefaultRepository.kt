@@ -54,6 +54,14 @@ class DefaultRepository : AppRepository {
         TODO("Not yet implemented")
     }
 
+    override suspend fun refreshUsers(phoneNumbers: List<String>) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun refreshUserDetails(phoneNumbers: List<String>) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun refreshUser(phoneNumber: String) {
         TODO("Not yet implemented")
     }

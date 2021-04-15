@@ -72,6 +72,22 @@ class FakeRepository @Inject constructor() : AppRepository {
         observableUsers.value = usersServiceData.values.toList()
     }
 
+    override suspend fun refreshUsers(phoneNumbers: List<String>) {
+        val previousUsers = observableUsers.value.toMutableList()
+        previousUsers.removeIf { phoneNumbers.contains(it.phoneNumber) }
+        val filtered = usersServiceData
+            .filterValues { phoneNumbers.contains(it.phoneNumber) }
+        previousUsers.addAll(filtered.values)
+    }
+
+    override suspend fun refreshUserDetails(phoneNumbers: List<String>) {
+        val previousUsers = observableUserDetails.value.toMutableList()
+        previousUsers.removeIf { phoneNumbers.contains(it.phoneNumber) }
+        val filtered = userDetailsServiceData
+            .filterValues { phoneNumbers.contains(it.phoneNumber) }
+        previousUsers.addAll(filtered.values)
+    }
+
     override suspend fun deleteUser(phoneNumber: String) {
         TODO("Not yet implemented")
     }
@@ -227,7 +243,7 @@ class FakeRepository @Inject constructor() : AppRepository {
 
     override suspend fun saveChatMessage(message: ChatMessage) {
         chatMessagesServiceData[message.id] = message
-        runBlocking { refreshChatMessages() } // to keep chat messages always realtime
+        refreshChatMessages() // to keep chat messages always realtime
     }
 
     override suspend fun saveChatRoom(room: ChatRoom) {
