@@ -6,10 +6,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TestContentProvider @Inject constructor() : AppContentProvider {
+class FakeContentProvider @Inject constructor() : AppContentProvider {
 
     var phoneNumbers: List<String> = emptyList()
     var loggedIn: Boolean = false
+    var phoneNumber: String? = null
 
     override fun getContactPhoneNumbers(contentResolver: ContentResolver): List<String> {
         return phoneNumbers
@@ -17,5 +18,9 @@ class TestContentProvider @Inject constructor() : AppContentProvider {
 
     override fun isLoggedIn(): Boolean {
         return loggedIn
+    }
+
+    override fun getCurrentUserPhoneNumber(): String? {
+        return phoneNumber
     }
 }

@@ -15,11 +15,11 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.EventObserver
-import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionAuthFragmentToRegisterFragment
 import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionAuthFragmentToVerifyCodeFragment
-import com.zancheema.android.telegram.util.setUpSnackbar
 import com.zancheema.android.telegram.databinding.AuthFragmentBinding
+import com.zancheema.android.telegram.register.RegisterFragmentDirections.Companion.actionGlobalRegisterFragment
 import com.zancheema.android.telegram.util.EspressoIdlingResource
+import com.zancheema.android.telegram.util.setUpSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 
@@ -84,9 +84,9 @@ class AuthFragment : Fragment() {
                         .addOnCompleteListener { task ->
                             EspressoIdlingResource.decrement()
                             if (task.isSuccessful) {
-                                viewModel.phoneNumber.value?.let {
+                                viewModel.phoneNumber.value?.let { phoneNumber ->
                                     findNavController().navigate(
-                                        actionAuthFragmentToRegisterFragment(it)
+                                        actionGlobalRegisterFragment(phoneNumber)
                                     )
                                 }
                             }

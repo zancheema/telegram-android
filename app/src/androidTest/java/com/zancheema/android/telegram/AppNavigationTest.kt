@@ -8,10 +8,12 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.zancheema.android.telegram.data.source.AppContentProvider
+import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.di.AppContentProviderModule
 import com.zancheema.android.telegram.di.AppRepositoryModule
 import com.zancheema.android.telegram.source.FakeRepository
-import com.zancheema.android.telegram.source.TestContentProvider
+import com.zancheema.android.telegram.source.FakeContentProvider
+import com.zancheema.android.telegram.util.saveUserDetailBlocking
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -36,7 +38,7 @@ class AppNavigationTest {
     lateinit var repository: FakeRepository
 
     @Inject
-    lateinit var contentProvider: TestContentProvider
+    lateinit var contentProvider: FakeContentProvider
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -47,7 +49,7 @@ class AppNavigationTest {
     }
 
     @Test
-    fun userLoggedIn_ShowsChats() {
+    fun userLoggedOut_DisplaysAuth() {
         contentProvider.loggedIn = false
         val activityScenario = ActivityScenario.launch(MainActivity::class.java)
 
@@ -58,8 +60,22 @@ class AppNavigationTest {
     }
 
     @Test
-    fun userNotLoggedIn_ShowsAuth() {
+    fun userLoggedInButNotRegistered_DisplaysRegistration() {
         contentProvider.loggedIn = true
+        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.registerLayout))
+            .check(matches(isDisplayed()))
+
+        activityScenario.close()
+    }
+
+    @Test
+    fun userLoggedInAndRegistered_DisplaysChats() {
+        val phoneNumber = "+13245558976"
+        contentProvider.loggedIn = true
+        contentProvider.phoneNumber = phoneNumber
+        repository.saveUserDetailBlocking(UserDetail(phoneNumber, "John", "Doe"))
         val activityScenario = ActivityScenario.launch(MainActivity::class.java)
 
         onView(withId(R.id.chatsLayout))
@@ -73,6 +89,6 @@ class AppNavigationTest {
     abstract class TestContentProviderModule {
         @Singleton
         @Binds
-        abstract fun provideTestContentProvider(provider: TestContentProvider): AppContentProvider
+        abstract fun provideTestContentProvider(provider: FakeContentProvider): AppContentProvider
     }
 }

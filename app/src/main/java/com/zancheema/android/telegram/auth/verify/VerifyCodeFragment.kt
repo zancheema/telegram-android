@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.zancheema.android.telegram.EventObserver
-import com.zancheema.android.telegram.auth.verify.VerifyCodeFragmentDirections.Companion.actionVerifyCodeFragmentToRegisterFragment
 import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionGlobalChatsFragment
 import com.zancheema.android.telegram.databinding.VerifyCodeFragmentBinding
+import com.zancheema.android.telegram.register.RegisterFragmentDirections.Companion.actionGlobalRegisterFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,7 +37,7 @@ class VerifyCodeFragment : Fragment() {
 
     private fun setUpNavigation() {
         viewModel.showRegistrationEvent.observe(viewLifecycleOwner, EventObserver { phoneNumber ->
-            findNavController().navigate(actionVerifyCodeFragmentToRegisterFragment(phoneNumber))
+            findNavController().navigate(actionGlobalRegisterFragment(phoneNumber))
         })
         viewModel.showChatsEvent.observe(viewLifecycleOwner, EventObserver {
             if (it) findNavController().navigate(actionGlobalChatsFragment())

@@ -124,7 +124,7 @@ class MainActivityTest {
                 .perform(click())
 
             // check RegisterFragment is displayed (user not registered already)
-            onView(withId(R.id.registerFragmentLayout))
+            onView(withId(R.id.registerLayout))
                 .check(matches(isDisplayed()))
 
             // close activity

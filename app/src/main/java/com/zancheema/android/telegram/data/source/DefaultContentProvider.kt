@@ -34,6 +34,10 @@ class DefaultContentProvider @Inject constructor() : AppContentProvider {
         return numbers
     }
 
+    override fun getCurrentUserPhoneNumber(): String? {
+        return Firebase.auth.currentUser?.phoneNumber
+    }
+
     override fun isLoggedIn(): Boolean {
         return Firebase.auth.currentUser != null
     }

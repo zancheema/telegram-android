@@ -6,4 +6,6 @@ interface AppContentProvider {
     fun getContactPhoneNumbers(contentResolver: ContentResolver): List<String>
 
     fun isLoggedIn(): Boolean
+
+    fun getCurrentUserPhoneNumber(): String?
 }

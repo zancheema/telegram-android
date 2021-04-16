@@ -54,7 +54,7 @@ class RegisterFragmentTest {
         val args = RegisterFragmentArgs(phoneNumber)
         launchFragmentInHiltContainer<RegisterFragment>(args.toBundle(), R.style.Theme_Telegram)
 
-        onView(withId(R.id.registerFragmentLayout))
+        onView(withId(R.id.registerLayout))
             .check(matches(isDisplayed()))
     }
 

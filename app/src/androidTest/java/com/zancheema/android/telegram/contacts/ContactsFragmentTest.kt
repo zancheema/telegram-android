@@ -15,7 +15,7 @@ import com.zancheema.android.telegram.di.AppRepositoryModule
 import com.zancheema.android.telegram.di.AppContentProviderModule
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
 import com.zancheema.android.telegram.source.FakeRepository
-import com.zancheema.android.telegram.source.TestContentProvider
+import com.zancheema.android.telegram.source.FakeContentProvider
 import com.zancheema.android.telegram.util.saveUserBlocking
 import com.zancheema.android.telegram.util.saveUserDetailBlocking
 import dagger.Binds
@@ -43,7 +43,7 @@ class ContactsFragmentTest {
     lateinit var repository: FakeRepository
 
     @Inject
-    lateinit var contentProvider: TestContentProvider
+    lateinit var contentProvider: FakeContentProvider
 
     private val user1 = User("+12345556543")
     private val user2 = User("+312345556703")
@@ -97,6 +97,6 @@ class ContactsFragmentTest {
     abstract class TestContentProviderModule {
         @Singleton
         @Binds
-        abstract fun provideTestContentProvider(provider: TestContentProvider): AppContentProvider
+        abstract fun provideTestContentProvider(provider: FakeContentProvider): AppContentProvider
     }
 }

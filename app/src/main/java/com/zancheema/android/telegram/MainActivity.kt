@@ -3,27 +3,28 @@ package com.zancheema.android.telegram
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.asLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionChatsFragmentToAuthFragment
-import com.zancheema.android.telegram.data.source.AppContentProvider
+import com.zancheema.android.telegram.auth.AuthFragmentDirections
+import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionGlobalAuthFragment
+import com.zancheema.android.telegram.register.RegisterFragmentDirections
+import com.zancheema.android.telegram.register.RegisterFragmentDirections.Companion.actionGlobalRegisterFragment
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var contentProvider: AppContentProvider
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +35,24 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         setUpDrawer(navController)
+        setUpNavigation(navController)
+    }
 
-        /** show login instead of chats of user is not logged in already */
-        if (!contentProvider.isLoggedIn()) {
-            navController.navigate(actionChatsFragmentToAuthFragment())
-        }
+    /** set up navigation based on the user authentication status */
+    private fun setUpNavigation(navController: NavController) {
+        viewModel.authStateEvent.asLiveData().observe(this, EventObserver { state ->
+
+            when (state) {
+                MainViewModel.AuthState.LOGGED_OUT -> navController.navigate(
+                    actionGlobalAuthFragment()
+                )
+                MainViewModel.AuthState.LOGGED_IN -> navController.navigate(
+                    actionGlobalRegisterFragment(
+                        viewModel.getCurrentUserPhoneNumber()
+                    )
+                )
+            }
+        })
     }
 
     /**
