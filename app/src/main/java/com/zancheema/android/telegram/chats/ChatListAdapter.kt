@@ -8,13 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zancheema.android.telegram.data.source.domain.Chat
 import com.zancheema.android.telegram.databinding.ListItemChatsBinding
 
-class ChatListAdapter : ListAdapter<Chat, ChatListAdapter.ViewHolder>(ChatDiffUtil()) {
+class ChatListAdapter(
+    private val viewModel: ChatsViewModel
+) : ListAdapter<Chat, ChatListAdapter.ViewHolder>(ChatDiffUtil()) {
 
     class ViewHolder private constructor(
         private val binding: ListItemChatsBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(chat: Chat) {
+        fun bind(chat: Chat, viewModel: ChatsViewModel) {
             binding.chat = chat
+            binding.viewModel = viewModel
+
+            binding.executePendingBindings()
         }
 
         companion object {
@@ -31,7 +36,7 @@ class ChatListAdapter : ListAdapter<Chat, ChatListAdapter.ViewHolder>(ChatDiffUt
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), viewModel)
     }
 }
 

@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.zancheema.android.telegram.databinding.ChatFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -33,6 +36,7 @@ class ChatFragment : Fragment() {
         viewDataBinding.lifecycleOwner = viewLifecycleOwner
         setUpArgs()
         setUpMessageList()
+        setUpToolbar()
     }
 
     @FlowPreview
@@ -44,9 +48,17 @@ class ChatFragment : Fragment() {
         }
     }
 
+    private fun setUpToolbar() {
+        val navController = findNavController()
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        viewDataBinding.toolbar
+            .setupWithNavController(navController, appBarConfiguration)
+    }
+
     private fun setUpArgs() {
         val args = ChatFragmentArgs.fromBundle(requireArguments())
         viewModel.chat.value = args.chat
-        viewDataBinding.toolbarChat.chat = args.chat
+        viewDataBinding.chat = args.chat
     }
 }

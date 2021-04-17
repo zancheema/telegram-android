@@ -9,11 +9,14 @@ import androidx.test.espresso.contrib.DrawerActions.open
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.DrawerMatchers.isOpen
 import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
+import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
+import com.zancheema.android.telegram.chats.ChatListAdapter
 import com.zancheema.android.telegram.data.source.AppContentProvider
+import com.zancheema.android.telegram.data.source.domain.Chat
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.di.AppContentProviderModule
 import com.zancheema.android.telegram.di.AppRepositoryModule
@@ -149,6 +152,44 @@ class AppNavigationTest {
         onView(withId(R.id.chatsLayout)).check(matches(isDisplayed()))
 
         // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
+    }
+
+    @Test
+    fun clickingOnChatsItemOpensItsChat() {
+        val chats = listOf(
+            Chat("cr_1", "http://example.com", "John Doe", "+1335", "Hey"),
+            Chat("cr_2", "http://example.com", "Jane Doe", "+133785", "Hello")
+        )
+        repository.setChats(chats)
+
+        contentProvider.loggedIn = true
+        registerUser()
+        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+
+        val position = 0
+        val selectedChat = chats[position]
+        // click chat list item
+        onView(withId(R.id.chatsList))
+            .perform(actionOnItemAtPosition<ChatListAdapter.ViewHolder>(position, click()))
+
+        // Chat screen is displayed
+        onView(withId(R.id.chatLayout))
+            .check(matches(isDisplayed()))
+        // Toolbar displays selected chat's data
+        onView(withId(R.id.tvTitle))
+            .check(matches(withText(selectedChat.userName)))
+
+        // Click home icon (navigate up)
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
+        ).perform(click())
+
+        // Check that contacts screen is displayed
+        onView(withId(R.id.chatsLayout)).check(matches(isDisplayed()))
+
         activityScenario.close()
     }
 

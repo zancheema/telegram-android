@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -38,5 +39,21 @@ class ChatsViewModelTest {
         assertThat(viewModel.chats.first(), `is`(emptyList()))
         val event = viewModel.emptyChatsEvent.first()
         assertThat(event.getContentIfNotHandled(), `is`(true))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun openChatGeneratesOpenChatEvent() = runBlockingTest {
+        // Event is null by default
+        var event = viewModel.openChatsEvent.first()
+        assertThat(event?.getContentIfNotHandled(), `is`(nullValue()))
+
+        // Call openChat(Chat)
+        val chat = Chat("cr_1", "http://example.com", "John", "+134", "hey")
+        viewModel.openChat(chat)
+
+        // Event is generated
+        event = viewModel.openChatsEvent.first()
+        assertThat(event?.getContentIfNotHandled(), `is`(chat))
     }
 }

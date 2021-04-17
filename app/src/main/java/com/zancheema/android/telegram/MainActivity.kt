@@ -1,19 +1,14 @@
 package com.zancheema.android.telegram
 
 import android.os.Bundle
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.asLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionGlobalAuthFragment
@@ -34,12 +29,11 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
         val navController = navHostFragment.navController
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbarMain)
         val drawerLayout = findViewById<DrawerLayout>(R.id.mainDrawerLayout)
         val navView = findViewById<NavigationView>(R.id.navView)
 
         setUpNavViewHeader(navView)
-        setUpDrawer(navController, drawerLayout, toolbar, navView)
+        setUpDrawer(navController, drawerLayout, navView)
         setUpNavigation(navController)
     }
 
@@ -82,21 +76,16 @@ class MainActivity : AppCompatActivity() {
     private fun setUpDrawer(
         navController: NavController,
         drawerLayout: DrawerLayout,
-        toolbar: Toolbar,
         navView: NavigationView
     ) {
-        val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
-
-        NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val (toolbarVisibility, drawerLockMode) = when (isAuthDestination(destination.id)) {
-                true -> Pair(GONE, DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                else -> Pair(VISIBLE, DrawerLayout.LOCK_MODE_UNLOCKED)
+            val lockMode = when (isAuthDestination(destination.id)) {
+                true -> DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+                else -> DrawerLayout.LOCK_MODE_UNLOCKED
             }
-            toolbar.visibility = toolbarVisibility
-            drawerLayout.setDrawerLockMode(drawerLockMode)
+            drawerLayout.setDrawerLockMode(lockMode)
         }
     }
 

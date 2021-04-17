@@ -10,6 +10,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.databinding.ContactsFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,6 +42,7 @@ class ContactsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewDataBinding.lifecycleOwner = viewLifecycleOwner
         setUpContactList()
+        setUpToolbar()
 
         checkSelfPermission()
     }
@@ -68,6 +72,14 @@ class ContactsFragment : Fragment() {
                 RC_READ_CONTACTS
             )
         }
+    }
+
+    private fun setUpToolbar() {
+        val navController = findNavController()
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        viewDataBinding.toolbar
+            .setupWithNavController(navController, appBarConfiguration)
     }
 
     private fun setUpContacts() {

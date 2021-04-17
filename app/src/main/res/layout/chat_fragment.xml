@@ -8,20 +8,55 @@
         <variable
             name="viewmodel"
             type="com.zancheema.android.telegram.chat.ChatViewModel" />
+
+        <variable
+            name="chat"
+            type="com.zancheema.android.telegram.data.source.domain.Chat" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/chatLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/blurred_background_chat"
         tools:context=".chat.ChatFragment">
 
-        <include
-            android:id="@+id/toolbarChat"
-            layout="@layout/toolbar_chat"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:id="@+id/ivChat"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:photo_url="@{chat.photoUrl}"
+                    app:srcCompat="@drawable/ic_baseline_person_24" />
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@{chat.userName}"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="@id/ivChat"
+                    app:layout_constraintStart_toEndOf="@id/ivChat"
+                    app:layout_constraintTop_toTopOf="@id/ivChat"
+                    tools:text="@string/sample_username" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.Toolbar>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messageList"
@@ -32,7 +67,7 @@
             app:layout_constraintBottom_toTopOf="@id/etMessageLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbarChat"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
             tools:listitem="@layout/chat_message_mine" />
 
         <com.google.android.material.textfield.TextInputLayout
