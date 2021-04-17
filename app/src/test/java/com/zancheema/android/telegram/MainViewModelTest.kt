@@ -9,7 +9,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert
+import org.hamcrest.CoreMatchers.nullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,29 +30,34 @@ class MainViewModelTest {
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
 
+    /**
+     * Only dependencies for the [viewModel] are initialized
+     * because the initializing time of [viewModel] is inconsistent in different tests
+     */
     @Before
-    fun init() {
+    fun initializeDependencies() {
         repository = FakeRepository()
         contentProvider = FakeContentProvider()
-        viewModel = MainViewModel(repository, contentProvider)
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun userLoggedOut_AuthStateIsLoggedOut() = runBlockingTest {
         contentProvider.loggedIn = false
+        viewModel = MainViewModel(repository, contentProvider)
 
         val state = viewModel.authStateEvent.first()
-        MatcherAssert.assertThat(state.getContentIfNotHandled(), `is`(AuthState.LOGGED_OUT))
+        assertThat(state.getContentIfNotHandled(), `is`(AuthState.LOGGED_OUT))
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun userLoggedInButNotRegistered_AuthStateIsLoggedIn() = runBlockingTest {
         contentProvider.loggedIn = true
+        viewModel = MainViewModel(repository, contentProvider)
 
         val state = viewModel.authStateEvent.first()
-        MatcherAssert.assertThat(state.getContentIfNotHandled(), `is`(AuthState.LOGGED_IN))
+        assertThat(state.getContentIfNotHandled(), `is`(AuthState.LOGGED_IN))
     }
 
     @ExperimentalCoroutinesApi
@@ -61,8 +67,40 @@ class MainViewModelTest {
         contentProvider.loggedIn = true
         contentProvider.phoneNumber = phoneNumber
         repository.saveUserDetail(UserDetail(phoneNumber, "John", "Doe"))
+        viewModel = MainViewModel(repository, contentProvider)
 
         val state = viewModel.authStateEvent.first()
-        MatcherAssert.assertThat(state.getContentIfNotHandled(), `is`(AuthState.REGISTERED))
+        assertThat(state.getContentIfNotHandled(), `is`(AuthState.REGISTERED))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun currentUserIsNullIfUserIsLoggedOut() = runBlockingTest {
+        contentProvider.loggedIn = false
+        viewModel = MainViewModel(repository, contentProvider)
+
+        assertThat(viewModel.currentUser.first(), `is`(nullValue()))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun currentUserIsNullIfUserIsLoggedInButNotRegistered() = runBlockingTest {
+        contentProvider.loggedIn = true
+        viewModel = MainViewModel(repository, contentProvider)
+
+        assertThat(viewModel.currentUser.first(), `is`(nullValue()))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun currentUserIsNotNullIfUserIsLoggedInAndRegistered() = runBlockingTest {
+        contentProvider.loggedIn = true // login
+        val phoneNumber = "+13245558976"
+        contentProvider.phoneNumber = phoneNumber
+        val userDetail = UserDetail(phoneNumber, "John", "Doe")
+        repository.saveUserDetail(userDetail) // register
+        viewModel = MainViewModel(repository, contentProvider)
+
+        assertThat(viewModel.currentUser.first(), `is`(userDetail))
     }
 }

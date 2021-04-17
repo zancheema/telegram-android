@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.data.source.AppRepository
+import com.zancheema.android.telegram.data.source.domain.UserDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,7 +16,6 @@ class MainViewModel @Inject constructor(
     private val repository: AppRepository,
     private val contentProvider: AppContentProvider
 ) : ViewModel() {
-
 
     fun getCurrentUserPhoneNumber(): String {
         return contentProvider.getCurrentUserPhoneNumber() ?: ""
@@ -32,6 +33,13 @@ class MainViewModel @Inject constructor(
         }
         emit(Event(state))
     }
+
+    val currentUser: Flow<UserDetail?> =
+        repository.observeUserDetail(getCurrentUserPhoneNumber())
+            .map { result ->
+                if (result is Result.Success) result.data
+                else null
+            }
 
     enum class AuthState {
         LOGGED_IN,

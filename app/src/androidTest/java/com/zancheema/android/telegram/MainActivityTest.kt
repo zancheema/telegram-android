@@ -1,25 +1,34 @@
 package com.zancheema.android.telegram
 
+import android.view.Gravity
 import android.widget.EditText
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.DrawerMatchers
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
+import com.zancheema.android.telegram.di.AppContentProviderModule
 import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.source.FakeContentProvider
 import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.*
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.junit.After
@@ -28,10 +37,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-@UninstallModules(AppRepositoryModule::class)
+@UninstallModules(AppRepositoryModule::class, AppContentProviderModule::class)
 @HiltAndroidTest
 class MainActivityTest {
 
@@ -40,6 +50,9 @@ class MainActivityTest {
 
     @Inject
     lateinit var repository: FakeRepository
+
+    @Inject
+    lateinit var contentProvider: FakeContentProvider
 
     // An Idling Resource that waits for Data Binding to have no pending bindings
     private val dataBindingIdlingResource = DataBindingIdlingResource()
@@ -73,16 +86,6 @@ class MainActivityTest {
         Firebase.auth.apply {
             if (currentUser != null) signOut()
         }
-    }
-
-    @Test
-    fun testPreConditions() {
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-        // check auth fragment is shown
-        onView(withId(R.id.authConstraintLayout))
-            .check(matches(isDisplayed()))
-        activityScenario.close()
     }
 
     @Test
@@ -179,5 +182,47 @@ class MainActivityTest {
 
         // close activity
         activityScenario.close()
+    }
+
+    @Test
+    fun userLoggedInAndRegister_DrawerHeaderDisplaysUserDetail() {
+        contentProvider.loggedIn = true
+        val phoneNumber = "+13245558976"
+        contentProvider.phoneNumber = phoneNumber
+        val userDetail = UserDetail(phoneNumber, "John", "Doe")
+        repository.saveUserDetailBlocking(userDetail)
+        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        // Drawer is closed by default
+        onView(withId(R.id.mainDrawerLayout))
+            .check(matches(DrawerMatchers.isClosed(Gravity.START)))
+
+        // Open drawer
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
+        ).perform(click())
+
+        // Check if the drawer is open
+        onView(withId(R.id.mainDrawerLayout))
+            .check(matches(DrawerMatchers.isOpen(Gravity.START)))
+        // Check if the drawer header displays user details
+        onView(withId(R.id.tvUsername))
+            .check(matches(withText(userDetail.fullName)))
+        onView(withId(R.id.tvPhoneNumber))
+            .check(matches(withText(userDetail.phoneNumber)))
+
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
+    }
+
+    @Module
+    @InstallIn(SingletonComponent::class)
+    abstract class TestContentProviderModule {
+        @Singleton
+        @Binds
+        abstract fun provideTestContentProvider(provider: FakeContentProvider): AppContentProvider
     }
 }

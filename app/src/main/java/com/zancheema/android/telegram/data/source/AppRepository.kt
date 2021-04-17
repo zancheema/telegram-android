@@ -1,6 +1,5 @@
 package com.zancheema.android.telegram.data.source
 
-import androidx.lifecycle.LiveData
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.source.domain.*
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +30,7 @@ interface AppRepository {
 
     suspend fun refreshUserDetails(phoneNumbers: List<String>)
 
-    fun observeUserDetail(phoneNumber: String): LiveData<Result<UserDetail>>
+    fun observeUserDetail(phoneNumber: String): Flow<Result<UserDetail>>
 
     suspend fun getUserDetail(
         phoneNumber: String,

@@ -1,6 +1,5 @@
 package com.zancheema.android.telegram.data.source
 
-import androidx.lifecycle.LiveData
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.source.domain.*
 import kotlinx.coroutines.flow.Flow
@@ -93,7 +92,7 @@ class DefaultRepository : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override fun observeUserDetail(phoneNumber: String): LiveData<Result<UserDetail>> {
+    override fun observeUserDetail(phoneNumber: String): Flow<Result<UserDetail>> {
         TODO("Not yet implemented")
     }
 

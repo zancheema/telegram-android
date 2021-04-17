@@ -1,6 +1,5 @@
 package com.zancheema.android.telegram.source
 
-import androidx.lifecycle.LiveData
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
@@ -169,8 +168,13 @@ class FakeRepository @Inject constructor() : AppRepository {
         } ?: return Error(Exception("UserDetail not found"))
     }
 
-    override fun observeUserDetail(phoneNumber: String): LiveData<Result<UserDetail>> {
-        TODO("Not yet implemented")
+    override fun observeUserDetail(phoneNumber: String): Flow<Result<UserDetail>> {
+        runBlocking { refreshUserDetail(phoneNumber) }
+        return observableUserDetails.map { details ->
+            val detail = details.firstOrNull()
+            if (detail == null) Error(Exception("user detail not found"))
+            else Success(detail)
+        }
     }
 
     override suspend fun getChatRooms(forceUpdate: Boolean): Result<List<ChatRoom>> {
