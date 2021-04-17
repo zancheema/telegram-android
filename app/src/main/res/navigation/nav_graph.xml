@@ -67,4 +67,8 @@
         app:destination="@id/authFragment"
         app:popUpTo="@id/nav_graph"
         app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="com.zancheema.android.telegram.contacts.ContactsFragment"
+        android:label="ContactsFragment" />
 </navigation>

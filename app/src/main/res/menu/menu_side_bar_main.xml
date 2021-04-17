@@ -4,6 +4,7 @@
     <group>
 
         <item
+            android:id="@+id/contactsFragment"
             android:icon="@drawable/ic_outline_contacts_24"
             android:title="@string/contacts" />
         <item

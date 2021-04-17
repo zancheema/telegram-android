@@ -1,18 +1,24 @@
 package com.zancheema.android.telegram
 
+import android.view.Gravity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.contrib.DrawerActions.open
+import androidx.test.espresso.contrib.DrawerMatchers.isClosed
+import androidx.test.espresso.contrib.DrawerMatchers.isOpen
+import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.rule.GrantPermissionRule
 import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.di.AppContentProviderModule
 import com.zancheema.android.telegram.di.AppRepositoryModule
-import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.source.FakeContentProvider
+import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.saveUserDetailBlocking
 import dagger.Binds
 import dagger.Module
@@ -43,6 +49,10 @@ class AppNavigationTest {
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
 
+    @get:Rule
+    val grantPermissionRule: GrantPermissionRule =
+        GrantPermissionRule.grant(android.Manifest.permission.READ_CONTACTS)
+
     @Before
     fun init() {
         hiltRule.inject()
@@ -72,16 +82,80 @@ class AppNavigationTest {
 
     @Test
     fun userLoggedInAndRegistered_DisplaysChats() {
-        val phoneNumber = "+13245558976"
         contentProvider.loggedIn = true
-        contentProvider.phoneNumber = phoneNumber
-        repository.saveUserDetailBlocking(UserDetail(phoneNumber, "John", "Doe"))
+        registerUser()
         val activityScenario = ActivityScenario.launch(MainActivity::class.java)
 
         onView(withId(R.id.chatsLayout))
             .check(matches(isDisplayed()))
 
         activityScenario.close()
+    }
+
+    @Test
+    fun chatsScreen_ClickOnDrawerIcon_OpensDrawer() {
+        contentProvider.loggedIn = true
+        registerUser()
+        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+
+        // Drawer is closed by default
+        onView(withId(R.id.mainDrawerLayout))
+            .check(matches(isClosed(Gravity.START)))
+
+        // Open drawer
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
+        ).perform(click())
+
+        // Check if the drawer is open
+        onView(withId(R.id.mainDrawerLayout))
+            .check(matches(isOpen(Gravity.START)))
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
+    }
+
+    @Test
+    fun drawerNavigationFromChatsToContactsAndNavigateUpToChats() {
+        contentProvider.loggedIn = true
+        registerUser()
+        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+
+        // Drawer is closed by default
+        onView(withId(R.id.mainDrawerLayout))
+            .check(matches(isClosed(Gravity.START)))
+
+        // Open drawer
+        onView(withId(R.id.mainDrawerLayout))
+            .check(matches(isClosed(Gravity.START)))
+            .perform(open())
+
+        // Start contacts screen
+        onView(withId(R.id.navView))
+            .perform(navigateTo(R.id.contactsFragment))
+
+        // Check that contacts screen is displayed
+        onView(withId(R.id.contactsLayout)).check(matches(isDisplayed()))
+
+        // Click home icon (navigate up)
+        onView(
+            withContentDescription(
+                activityScenario.getToolbarNavigationContentDescription()
+            )
+        ).perform(click())
+
+        // Check that contacts screen is displayed
+        onView(withId(R.id.chatsLayout)).check(matches(isDisplayed()))
+
+        // When using ActivityScenario.launch, always call close()
+        activityScenario.close()
+    }
+
+    private fun registerUser() {
+        val phoneNumber = "+13245558976"
+        contentProvider.phoneNumber = phoneNumber
+        repository.saveUserDetailBlocking(UserDetail(phoneNumber, "John", "Doe"))
     }
 
     @Module

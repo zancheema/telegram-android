@@ -47,6 +47,6 @@ class ChatFragment : Fragment() {
     private fun setUpArgs() {
         val args = ChatFragmentArgs.fromBundle(requireArguments())
         viewModel.chat.value = args.chat
-        viewDataBinding.toolbar.chat = args.chat
+        viewDataBinding.toolbarChat.chat = args.chat
     }
 }
