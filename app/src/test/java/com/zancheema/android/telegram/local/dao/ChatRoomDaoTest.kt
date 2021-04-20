@@ -89,7 +89,7 @@ class ChatRoomDaoTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun getAllChats() = runBlockingTest {
+    fun getAllChatsReturnsChatsForChatRoomsWithMinimumOneMessage() = runBlockingTest {
         val userDetail1 = DbUserDetail(user1.phoneNumber, "John", "Doe", "http://example.com")
         val userDetail2 = DbUserDetail(user2.phoneNumber, "John", "Doe", "http://example.com")
         val userDetail3 = DbUserDetail(user3.phoneNumber, "Michael", "Doe", "http://example.com")
@@ -108,8 +108,10 @@ class ChatRoomDaoTest {
 
         val time = System.currentTimeMillis()
         val chatRoom1Message1 = DbChatMessage("m1", chatRoom1.id, "Hello", timestamp = time)
-        val chatRoom1Message2 = DbChatMessage("m2", chatRoom1.id, "How are you doing?", timestamp = time + 2L)
-        val chatRoom2Message1 = DbChatMessage("m3", chatRoom2.id, "Hey", false, timestamp = time+1L)
+        val chatRoom1Message2 =
+            DbChatMessage("m2", chatRoom1.id, "How are you doing?", timestamp = time + 2L)
+        val chatRoom2Message1 =
+            DbChatMessage("m3", chatRoom2.id, "Hey", false, timestamp = time + 1L)
         val messages = listOf(chatRoom1Message1, chatRoom1Message2, chatRoom2Message1)
         messages.forEach { database.chatMessageDao().insert(it) }
 

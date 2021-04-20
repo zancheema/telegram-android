@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
 import com.zancheema.android.telegram.R
-import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.di.AppContentModule
 import com.zancheema.android.telegram.source.FakeRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@UninstallModules(AppRepositoryModule::class)
+@UninstallModules(AppContentModule::class)
 @HiltAndroidTest
 class VerifyCodeFragmentTest {
     @get:Rule

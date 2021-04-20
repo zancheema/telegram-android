@@ -65,7 +65,7 @@ class MainViewModelTest {
     fun userLoggedInAndRegistered_AuthStateIsRegistered() = runBlockingTest {
         val phoneNumber = "+13245558976"
         contentProvider.loggedIn = true
-        contentProvider.phoneNumber = phoneNumber
+        contentProvider.currentPhoneNumber = phoneNumber
         repository.saveUserDetail(UserDetail(phoneNumber, "John", "Doe"))
         viewModel = MainViewModel(repository, contentProvider)
 
@@ -96,7 +96,7 @@ class MainViewModelTest {
     fun currentUserIsNotNullIfUserIsLoggedInAndRegistered() = runBlockingTest {
         contentProvider.loggedIn = true // login
         val phoneNumber = "+13245558976"
-        contentProvider.phoneNumber = phoneNumber
+        contentProvider.currentPhoneNumber = phoneNumber
         val userDetail = UserDetail(phoneNumber, "John", "Doe")
         repository.saveUserDetail(userDetail) // register
         viewModel = MainViewModel(repository, contentProvider)

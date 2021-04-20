@@ -1,7 +1,7 @@
 package com.zancheema.android.telegram.auth
 
+import android.os.Bundle
 import android.widget.EditText
-import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
@@ -10,9 +10,9 @@ import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.zancheema.android.telegram.MainActivity
 import com.zancheema.android.telegram.R
-import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.di.AppContentModule
+import com.zancheema.android.telegram.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@UninstallModules(AppRepositoryModule::class)
+@UninstallModules(AppContentModule::class)
 @HiltAndroidTest
 class AuthFragmentTest {
 
@@ -42,7 +42,7 @@ class AuthFragmentTest {
         val countryCode = "92"
         val countryName = "Pakistan"
 
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        launchFragmentInHiltContainer<AuthFragment>(Bundle(), R.style.Theme_Telegram)
 
         onView(withId(R.id.countryCodePicker)).perform(ViewActions.click())
         onView(instanceOf(EditText::class.java))
@@ -59,7 +59,5 @@ class AuthFragmentTest {
         // Country name is displayed
         onView(withId(R.id.authCountry))
             .check(matches(withText(countryName)))
-
-        activityScenario.close()
     }
 }

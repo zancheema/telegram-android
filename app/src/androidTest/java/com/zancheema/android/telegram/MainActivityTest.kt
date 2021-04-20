@@ -2,6 +2,7 @@ package com.zancheema.android.telegram
 
 import android.view.Gravity
 import android.widget.EditText
+import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
@@ -14,21 +15,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
-import com.zancheema.android.telegram.di.AppContentProviderModule
-import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.di.AppContentModule
 import com.zancheema.android.telegram.source.FakeContentProvider
 import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.*
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.junit.After
@@ -37,11 +32,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-@UninstallModules(AppRepositoryModule::class, AppContentProviderModule::class)
+@UninstallModules(AppContentModule::class)
 @HiltAndroidTest
 class MainActivityTest {
 
@@ -97,7 +91,7 @@ class MainActivityTest {
             val settings = Firebase.auth.firebaseAuthSettings
             // Turn off phone auth app verification.
             settings.setAppVerificationDisabledForTesting(true)
-            val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+            val activityScenario = launchActivity()
             dataBindingIdlingResource.monitorActivity(activityScenario)
 
             // set country code
@@ -147,7 +141,7 @@ class MainActivityTest {
         repository.saveUserDetailBlocking(userDetail)
         // Turn off phone auth app verification.
         settings.setAppVerificationDisabledForTesting(true)
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        val activityScenario = launchActivity()
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // set country code
@@ -188,10 +182,10 @@ class MainActivityTest {
     fun userLoggedInAndRegister_DrawerHeaderDisplaysUserDetail() {
         contentProvider.loggedIn = true
         val phoneNumber = "+13245558976"
-        contentProvider.phoneNumber = phoneNumber
+        contentProvider.currentPhoneNumber = phoneNumber
         val userDetail = UserDetail(phoneNumber, "John", "Doe")
         repository.saveUserDetailBlocking(userDetail)
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        val activityScenario = launchActivity()
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         // Drawer is closed by default
@@ -218,11 +212,21 @@ class MainActivityTest {
         activityScenario.close()
     }
 
-    @Module
-    @InstallIn(SingletonComponent::class)
-    abstract class TestContentProviderModule {
-        @Singleton
-        @Binds
-        abstract fun provideTestContentProvider(provider: FakeContentProvider): AppContentProvider
+    private fun launchActivity(): ActivityScenario<MainActivity> {
+        // Temporary set the navController to test navController
+        // to escape the exception
+        contentProvider.navcontroller = getTestNavController()
+
+        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        activityScenario.onActivity { activity ->
+            // once activity is launched set the navController
+            // to real navController
+            // because real navController is needed to get contentDescription
+
+            contentProvider.navcontroller =
+                Navigation.findNavController(activity, R.id.navHostFragment)
+        }
+
+        return activityScenario
     }
 }

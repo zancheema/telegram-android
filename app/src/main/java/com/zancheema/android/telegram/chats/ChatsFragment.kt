@@ -11,12 +11,13 @@ import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupWithNavController
 import com.zancheema.android.telegram.EventObserver
 import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.chats.ChatsFragmentDirections.Companion.actionChatsFragmentToChatFragment
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.databinding.ChatsFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatsFragment : Fragment() {
@@ -24,6 +25,9 @@ class ChatsFragment : Fragment() {
     private val viewModel by viewModels<ChatsViewModel>()
 
     private lateinit var viewDataBinding: ChatsFragmentBinding
+
+    @Inject
+    lateinit var contentProvider: AppContentProvider
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,24 +43,23 @@ class ChatsFragment : Fragment() {
         setUpChatList()
         setUpVisibility()
         setUpNavigation()
-        setUpToolbar()
     }
 
-    private fun setUpToolbar() {
-        val navController = findNavController()
+    private fun setUpNavigation() {
+        val navController = contentProvider.findNavController(this)
         val drawerLayout = requireActivity().findViewById<DrawerLayout>(R.id.mainDrawerLayout)
         val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
 
+        // Set up toolbar navigation ui
         NavigationUI.setupWithNavController(
             viewDataBinding.toolbar,
             navController,
             appBarConfiguration
         )
-    }
 
-    private fun setUpNavigation() {
+        // Set up navigation event
         viewModel.openChatsEvent.asLiveData().observe(viewLifecycleOwner, EventObserver { chat ->
-            findNavController().navigate(actionChatsFragmentToChatFragment(chat))
+            navController.navigate(actionChatsFragmentToChatFragment(chat.chatRoomId))
         })
     }
 

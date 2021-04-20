@@ -18,7 +18,10 @@ package com.zancheema.android.telegram
 
 import android.app.Activity
 import androidx.appcompat.widget.Toolbar
+import androidx.navigation.NavController
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 
 fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription(): String {
     var description = ""
@@ -28,3 +31,11 @@ fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription():
     }
     return description
 }
+
+fun getTestNavController(currentDestinationId: Int = R.id.chatsFragment): NavController =
+    TestNavHostController(
+        ApplicationProvider.getApplicationContext()
+    ).apply {
+        setGraph(R.navigation.nav_graph)
+        setCurrentDestination(currentDestinationId)
+    }

@@ -13,18 +13,16 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppRepositoryModule {
+object AppContentModule {
     @Singleton
     @Provides
     fun provideAppRepository(): AppRepository {
         return DefaultRepository()
     }
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppContentProviderModule {
     @Singleton
-    @Binds
-    abstract fun provideTestContentProvider(provider: DefaultContentProvider): AppContentProvider
+    @Provides
+    fun provideAppContentProvider(): AppContentProvider {
+        return DefaultContentProvider()
+    }
 }

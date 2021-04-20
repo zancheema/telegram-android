@@ -2,8 +2,11 @@ package com.zancheema.android.telegram.contacts
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.zancheema.android.telegram.MainCoroutineRule
+import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
+import com.zancheema.android.telegram.data.succeeded
+import com.zancheema.android.telegram.source.FakeContentProvider
 import com.zancheema.android.telegram.source.FakeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -18,6 +21,8 @@ import org.junit.Test
 class ContactsViewModelTest {
 
     private lateinit var repository: FakeRepository
+    private lateinit var contentProvider: FakeContentProvider
+
     private lateinit var viewModel: ContactsViewModel
 
     private val user1 = User("+12345556543")
@@ -46,8 +51,10 @@ class ContactsViewModelTest {
             saveUserDetail(userDetail2)
             saveUserDetail(userDetail3)
         }
+        contentProvider = FakeContentProvider()
+        contentProvider.currentPhoneNumber = user1.phoneNumber
 
-        viewModel = ContactsViewModel(repository)
+        viewModel = ContactsViewModel(repository, contentProvider)
     }
 
     @FlowPreview
@@ -70,5 +77,19 @@ class ContactsViewModelTest {
         assertThat(loaded.contains(userDetail1), `is`(true))
         assertThat(loaded.contains(userDetail2), `is`(true))
         assertThat(loaded.contains(userDetail3), `is`(false))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun setContactNumbersCreatesChatRoomsWithTheNumbers() = runBlockingTest {
+        viewModel.setContactNumbers(listOf(user2.phoneNumber, user3.phoneNumber))
+
+        val loaded = repository.getChatRooms()
+
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data.size, `is`(2))
+        assertThat(loaded.data[0].phoneNumber, `is`(user2.phoneNumber))
+        assertThat(loaded.data[1].phoneNumber, `is`(user3.phoneNumber))
     }
 }

@@ -2,6 +2,9 @@ package com.zancheema.android.telegram.data.source
 
 import android.content.ContentResolver
 import android.provider.ContactsContract
+import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import javax.inject.Inject
@@ -36,6 +39,10 @@ class DefaultContentProvider @Inject constructor() : AppContentProvider {
 
     override fun getCurrentUserPhoneNumber(): String? {
         return Firebase.auth.currentUser?.phoneNumber
+    }
+
+    override fun findNavController(fragment: Fragment): NavController {
+        return NavHostFragment.findNavController(fragment)
     }
 
     override fun isLoggedIn(): Boolean {

@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.databinding.ChatFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatFragment : Fragment() {
@@ -20,6 +21,9 @@ class ChatFragment : Fragment() {
     private val viewModel by viewModels<ChatViewModel>()
 
     private lateinit var viewDataBinding: ChatFragmentBinding
+
+    @Inject
+    lateinit var contentProvider: AppContentProvider
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +40,7 @@ class ChatFragment : Fragment() {
         viewDataBinding.lifecycleOwner = viewLifecycleOwner
         setUpArgs()
         setUpMessageList()
-        setUpToolbar()
+        setUpNavigation()
     }
 
     @FlowPreview
@@ -48,8 +52,8 @@ class ChatFragment : Fragment() {
         }
     }
 
-    private fun setUpToolbar() {
-        val navController = findNavController()
+    private fun setUpNavigation() {
+        val navController = contentProvider.findNavController(this)
         val appBarConfiguration = AppBarConfiguration(navController.graph)
 
         viewDataBinding.toolbar
@@ -58,7 +62,9 @@ class ChatFragment : Fragment() {
 
     private fun setUpArgs() {
         val args = ChatFragmentArgs.fromBundle(requireArguments())
-        viewModel.chat.value = args.chat
-        viewDataBinding.chat = args.chat
+        viewModel.setChatRoomId(args.chatRoomId)
+        viewModel.userDetail.asLiveData().observe(viewLifecycleOwner) { detail ->
+            detail?.let { viewDataBinding.userDetail = it }
+        }
     }
 }

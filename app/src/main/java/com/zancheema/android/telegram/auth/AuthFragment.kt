@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
@@ -16,12 +15,14 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.EventObserver
 import com.zancheema.android.telegram.auth.AuthFragmentDirections.Companion.actionAuthFragmentToVerifyCodeFragment
+import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.databinding.AuthFragmentBinding
 import com.zancheema.android.telegram.register.RegisterFragmentDirections.Companion.actionGlobalRegisterFragment
 import com.zancheema.android.telegram.util.EspressoIdlingResource
 import com.zancheema.android.telegram.util.setUpSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AuthFragment : Fragment() {
@@ -29,6 +30,9 @@ class AuthFragment : Fragment() {
     private val viewModel by viewModels<AuthViewModel>()
 
     private lateinit var viewDataBinding: AuthFragmentBinding
+
+    @Inject
+    lateinit var contentProvider: AppContentProvider
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,6 +65,8 @@ class AuthFragment : Fragment() {
     }
 
     private fun verifyPhoneNumber(phoneNumber: String) {
+        val navController = contentProvider.findNavController(this)
+
         val options = PhoneAuthOptions.newBuilder(Firebase.auth)
             .setPhoneNumber(phoneNumber)
             .setTimeout(30L, TimeUnit.SECONDS)
@@ -76,7 +82,7 @@ class AuthFragment : Fragment() {
                         phoneNumber,
                         verificationId
                     )
-                    findNavController().navigate(action)
+                    navController.navigate(action)
                 }
 
                 override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
@@ -85,7 +91,7 @@ class AuthFragment : Fragment() {
                             EspressoIdlingResource.decrement()
                             if (task.isSuccessful) {
                                 viewModel.phoneNumber.value?.let { phoneNumber ->
-                                    findNavController().navigate(
+                                    navController.navigate(
                                         actionGlobalRegisterFragment(phoneNumber)
                                     )
                                 }

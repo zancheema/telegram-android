@@ -7,10 +7,15 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.R
-import com.zancheema.android.telegram.data.source.domain.*
-import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.data.source.domain.ChatMessage
+import com.zancheema.android.telegram.data.source.domain.ChatRoom
+import com.zancheema.android.telegram.data.source.domain.User
+import com.zancheema.android.telegram.data.source.domain.UserDetail
+import com.zancheema.android.telegram.di.AppContentModule
+import com.zancheema.android.telegram.getTestNavController
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
-import com.zancheema.android.telegram.source.*
+import com.zancheema.android.telegram.source.FakeContentProvider
+import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.saveChatMessageBlocking
 import com.zancheema.android.telegram.util.saveChatRoomBlocking
 import com.zancheema.android.telegram.util.saveUserBlocking
@@ -26,17 +31,19 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@UninstallModules(AppRepositoryModule::class)
+@UninstallModules(AppContentModule::class)
 @HiltAndroidTest
 class ChatFragmentTest {
 
     private val sender = UserDetail("+13434589734", "John", "Doe")
     private val receiver = UserDetail("+32579459634", "John", "Doe")
-    private val chat =
-        Chat("chat_room", "http://example.com", receiver.firstName, receiver.phoneNumber, "")
+    private val chatRoom = ChatRoom("chat_room", receiver.phoneNumber)
 
     @Inject
     lateinit var repository: FakeRepository
+
+    @Inject
+    lateinit var appContentProvider: FakeContentProvider
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -52,7 +59,7 @@ class ChatFragmentTest {
             saveUserDetailBlocking(sender)
             saveUserDetailBlocking(receiver)
 
-            saveChatRoomBlocking(ChatRoom(chat.chatRoomId, chat.phoneNumber))
+            saveChatRoomBlocking(chatRoom)
         }
     }
 
@@ -69,7 +76,7 @@ class ChatFragmentTest {
         launchChat()
 
         onView(withId(R.id.tvTitle))
-            .check(matches(withText(sender.firstName)))
+            .check(matches(withText(sender.fullName)))
     }
 
     @Test
@@ -93,7 +100,7 @@ class ChatFragmentTest {
         launchChat()
 
         // new message is received from outside
-        val chatMessage = ChatMessage("msg_1", chat.chatRoomId, "Hello", false)
+        val chatMessage = ChatMessage("msg_1", chatRoom.id, "Hello", false)
         repository.saveChatMessageBlocking(chatMessage)
 
         onView(withId(R.id.messageList))
@@ -101,7 +108,8 @@ class ChatFragmentTest {
     }
 
     private fun launchChat() {
-        val args = ChatFragmentArgs(chat)
+        appContentProvider.navcontroller = getTestNavController(R.id.chatFragment)
+        val args = ChatFragmentArgs(chatRoom.id)
         launchFragmentInHiltContainer<ChatFragment>(args.toBundle(), R.style.Theme_Telegram)
     }
 }

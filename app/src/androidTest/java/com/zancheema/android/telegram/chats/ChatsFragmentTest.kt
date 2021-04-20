@@ -1,19 +1,27 @@
 package com.zancheema.android.telegram.chats
 
 import android.os.Bundle
+import androidx.navigation.NavController
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.source.domain.Chat
-import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.data.source.domain.UserDetail
+import com.zancheema.android.telegram.di.AppContentModule
+import com.zancheema.android.telegram.getTestNavController
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
+import com.zancheema.android.telegram.source.FakeContentProvider
 import com.zancheema.android.telegram.source.FakeRepository
+import com.zancheema.android.telegram.util.saveUserDetailBlocking
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -25,7 +33,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@UninstallModules(AppRepositoryModule::class)
+@UninstallModules(AppContentModule::class)
 @HiltAndroidTest
 class ChatsFragmentTest {
 
@@ -39,6 +47,9 @@ class ChatsFragmentTest {
     @Inject
     lateinit var repository: FakeRepository
 
+    @Inject
+    lateinit var contentProvider: FakeContentProvider
+
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
 
@@ -49,7 +60,7 @@ class ChatsFragmentTest {
 
     @Test
     fun emptyChatList_DisplaysNoChatsMessageAndHidesChatsList() {
-        launchFragmentInHiltContainer<ChatsFragment>(Bundle(), R.style.Theme_Telegram)
+        launchFragmentAndGetNavController()
 
         onView(withId(R.id.tvEmptyChats))
             .check(matches(isDisplayed()))
@@ -60,7 +71,7 @@ class ChatsFragmentTest {
     @Test
     fun chatsNotEmpty_DisplaysChatsListAndHidesNoChatsMessage() {
         repository.setChats(chatsStub())
-        launchFragmentInHiltContainer<ChatsFragment>(Bundle(), R.style.Theme_Telegram)
+        launchFragmentAndGetNavController()
 
         onView(withId(R.id.chatsList))
             .check(matches(isDisplayed()))
@@ -72,7 +83,7 @@ class ChatsFragmentTest {
     fun chatListDisplaysChats() {
         val chats = chatsStub()
         repository.setChats(chats)
-        launchFragmentInHiltContainer<ChatsFragment>(Bundle(), R.style.Theme_Telegram)
+        launchFragmentAndGetNavController()
 
         for (chat in chats) {
             onView(withId(R.id.chatsList))
@@ -82,7 +93,43 @@ class ChatsFragmentTest {
         }
     }
 
-    private fun formattedTime(millis: Long): String  {
+    @Test
+    fun clickingOnChatsItemOpensItsChat() {
+        val chats = listOf(
+            Chat("cr_1", "http://example.com", "John Doe", "+1335", "Hey"),
+            Chat("cr_2", "http://example.com", "Jane Doe", "+133785", "Hello")
+        )
+        repository.setChats(chats)
+
+        contentProvider.loggedIn = true
+        // Register user
+        val phoneNumber = "+13245558976"
+        contentProvider.currentPhoneNumber = phoneNumber
+        repository.saveUserDetailBlocking(UserDetail(phoneNumber, "John", "Doe"))
+
+        val navController = launchFragmentAndGetNavController()
+
+        // click chat list item
+        onView(withId(R.id.chatsList))
+            .perform(
+                RecyclerViewActions.actionOnItemAtPosition<ChatListAdapter.ViewHolder>(
+                    0,
+                    ViewActions.click()
+                )
+            )
+
+        // Verify navigation to chat
+        assertThat(navController.currentDestination?.id, `is`(R.id.chatFragment))
+    }
+
+    private fun launchFragmentAndGetNavController(): NavController {
+        val navController = getTestNavController(R.id.chatsFragment)
+        contentProvider.navcontroller = navController
+        launchFragmentInHiltContainer<ChatsFragment>(Bundle(), R.style.Theme_Telegram)
+        return navController
+    }
+
+    private fun formattedTime(millis: Long): String {
         val time = SimpleDateFormat("hh:mm a", Locale.getDefault())
         return time.format(Date(millis))
     }

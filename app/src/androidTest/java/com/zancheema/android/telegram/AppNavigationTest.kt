@@ -1,6 +1,7 @@
 package com.zancheema.android.telegram
 
 import android.view.Gravity
+import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -9,37 +10,27 @@ import androidx.test.espresso.contrib.DrawerActions.open
 import androidx.test.espresso.contrib.DrawerMatchers.isClosed
 import androidx.test.espresso.contrib.DrawerMatchers.isOpen
 import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
-import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
-import com.zancheema.android.telegram.chats.ChatListAdapter
-import com.zancheema.android.telegram.data.source.AppContentProvider
-import com.zancheema.android.telegram.data.source.domain.Chat
 import com.zancheema.android.telegram.data.source.domain.UserDetail
-import com.zancheema.android.telegram.di.AppContentProviderModule
-import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.di.AppContentModule
 import com.zancheema.android.telegram.source.FakeContentProvider
 import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.saveUserDetailBlocking
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-@UninstallModules(AppRepositoryModule::class, AppContentProviderModule::class)
+@UninstallModules(AppContentModule::class)
 @HiltAndroidTest
 class AppNavigationTest {
 
@@ -64,7 +55,7 @@ class AppNavigationTest {
     @Test
     fun userLoggedOut_DisplaysAuth() {
         contentProvider.loggedIn = false
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        val activityScenario = launchActivity()
 
         onView(withId(R.id.authConstraintLayout))
             .check(matches(isDisplayed()))
@@ -75,7 +66,7 @@ class AppNavigationTest {
     @Test
     fun userLoggedInButNotRegistered_DisplaysRegistration() {
         contentProvider.loggedIn = true
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        val activityScenario = launchActivity()
 
         onView(withId(R.id.registerLayout))
             .check(matches(isDisplayed()))
@@ -87,7 +78,7 @@ class AppNavigationTest {
     fun userLoggedInAndRegistered_DisplaysChats() {
         contentProvider.loggedIn = true
         registerUser()
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        val activityScenario = launchActivity()
 
         onView(withId(R.id.chatsLayout))
             .check(matches(isDisplayed()))
@@ -99,7 +90,7 @@ class AppNavigationTest {
     fun chatsScreen_ClickOnDrawerIcon_OpensDrawer() {
         contentProvider.loggedIn = true
         registerUser()
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        val activityScenario = launchActivity()
 
         // Drawer is closed by default
         onView(withId(R.id.mainDrawerLayout))
@@ -123,7 +114,7 @@ class AppNavigationTest {
     fun drawerNavigationFromChatsToContactsAndNavigateUpToChats() {
         contentProvider.loggedIn = true
         registerUser()
-        val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        val activityScenario = launchActivity()
 
         // Drawer is closed by default
         onView(withId(R.id.mainDrawerLayout))
@@ -155,55 +146,27 @@ class AppNavigationTest {
         activityScenario.close()
     }
 
-    @Test
-    fun clickingOnChatsItemOpensItsChat() {
-        val chats = listOf(
-            Chat("cr_1", "http://example.com", "John Doe", "+1335", "Hey"),
-            Chat("cr_2", "http://example.com", "Jane Doe", "+133785", "Hello")
-        )
-        repository.setChats(chats)
+    private fun launchActivity(): ActivityScenario<MainActivity> {
+        // Temporary set the navController to test navController
+        // to escape the exception
+        contentProvider.navcontroller = getTestNavController()
 
-        contentProvider.loggedIn = true
-        registerUser()
         val activityScenario = ActivityScenario.launch(MainActivity::class.java)
+        activityScenario.onActivity { activity ->
+            // once activity is launched set the navController
+            // to real navController
+            // because real navController is needed to get contentDescription
 
-        val position = 0
-        val selectedChat = chats[position]
-        // click chat list item
-        onView(withId(R.id.chatsList))
-            .perform(actionOnItemAtPosition<ChatListAdapter.ViewHolder>(position, click()))
+            contentProvider.navcontroller =
+                Navigation.findNavController(activity, R.id.navHostFragment)
+        }
 
-        // Chat screen is displayed
-        onView(withId(R.id.chatLayout))
-            .check(matches(isDisplayed()))
-        // Toolbar displays selected chat's data
-        onView(withId(R.id.tvTitle))
-            .check(matches(withText(selectedChat.userName)))
-
-        // Click home icon (navigate up)
-        onView(
-            withContentDescription(
-                activityScenario.getToolbarNavigationContentDescription()
-            )
-        ).perform(click())
-
-        // Check that contacts screen is displayed
-        onView(withId(R.id.chatsLayout)).check(matches(isDisplayed()))
-
-        activityScenario.close()
+        return activityScenario
     }
 
     private fun registerUser() {
         val phoneNumber = "+13245558976"
-        contentProvider.phoneNumber = phoneNumber
+        contentProvider.currentPhoneNumber = phoneNumber
         repository.saveUserDetailBlocking(UserDetail(phoneNumber, "John", "Doe"))
-    }
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    abstract class TestContentProviderModule {
-        @Singleton
-        @Binds
-        abstract fun provideTestContentProvider(provider: FakeContentProvider): AppContentProvider
     }
 }

@@ -8,8 +8,9 @@ import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.AppRepository
-import com.zancheema.android.telegram.data.source.domain.Chat
 import com.zancheema.android.telegram.data.source.domain.ChatMessage
+import com.zancheema.android.telegram.data.source.domain.ChatRoom
+import com.zancheema.android.telegram.data.source.domain.UserDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -21,7 +22,11 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {
-    val chat = MutableStateFlow<Chat?>(null)
+    private val chatRoom = MutableStateFlow<ChatRoom?>(null)
+
+    private val _userDetail = MutableStateFlow<UserDetail?>(null)
+    val userDetail: Flow<UserDetail?>
+        get() = _userDetail
 
     val messageText = MutableLiveData<String>()
 
@@ -31,11 +36,11 @@ class ChatViewModel @Inject constructor(
 
     @FlowPreview
     val chatMessages: Flow<List<ChatMessage>>
-        get() = chat
-            .flatMapConcat { chat ->
+        get() = chatRoom
+            .flatMapConcat { room ->
                 try {
-                    checkNotNull(chat)
-                    repository.observeChatMessages(chat.chatRoomId)
+                    checkNotNull(room)
+                    repository.observeChatMessages(room.id)
                 } catch (e: Exception) {
                     _invalidChatEvent.value = Event(R.string.invalid_chat)
                     flowOf(Error(e))
@@ -48,9 +53,24 @@ class ChatViewModel @Inject constructor(
                 }
             }
 
+    fun setChatRoomId(id: String) {
+        viewModelScope.launch {
+            when (val room = repository.getChatRoom(id, true)) {
+                is Success -> {
+                    chatRoom.value = room.data
+                    when (val detail = repository.getUserDetail(room.data.phoneNumber, true)) {
+                        is Success -> _userDetail.value = detail.data
+                        else -> TODO("not yet implemented")
+                    }
+                }
+                else -> TODO("not yet implemented")
+            }
+        }
+    }
+
     fun sendMessage() {
         val message = messageText.value
-        val chatValue = chat.value
+        val chatValue = chatRoom.value
 
         messageText.value = "" // clear the text
 
@@ -59,7 +79,7 @@ class ChatViewModel @Inject constructor(
                 repository.saveChatMessage(
                     ChatMessage(
                         randomUUID().toString(),
-                        chatValue.chatRoomId,
+                        chatValue.id,
                         message
                     )
                 )

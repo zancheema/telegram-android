@@ -1,8 +1,6 @@
 package com.zancheema.android.telegram.register
 
-import androidx.navigation.Navigation
-import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ApplicationProvider
+import androidx.navigation.NavController
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -14,8 +12,10 @@ import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.succeeded
-import com.zancheema.android.telegram.di.AppRepositoryModule
+import com.zancheema.android.telegram.di.AppContentModule
+import com.zancheema.android.telegram.getTestNavController
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
+import com.zancheema.android.telegram.source.FakeContentProvider
 import com.zancheema.android.telegram.source.FakeRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -31,7 +31,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@UninstallModules(AppRepositoryModule::class)
+@UninstallModules(AppContentModule::class)
 @HiltAndroidTest
 class RegisterFragmentTest {
 
@@ -39,6 +39,9 @@ class RegisterFragmentTest {
 
     @Inject
     lateinit var repository: FakeRepository
+
+    @Inject
+    lateinit var contentProvider: FakeContentProvider
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -52,7 +55,7 @@ class RegisterFragmentTest {
     @Test
     fun launchSuccessfully() {
         val args = RegisterFragmentArgs(phoneNumber)
-        launchFragmentInHiltContainer<RegisterFragment>(args.toBundle(), R.style.Theme_Telegram)
+        launchFragmentAndGetNavController(args)
 
         onView(withId(R.id.registerLayout))
             .check(matches(isDisplayed()))
@@ -62,18 +65,8 @@ class RegisterFragmentTest {
     fun clickFabNext_ValidDetail_SavesUserDetailInRepositoryAndNavigatesToChats() =
         runBlocking {
             val args = RegisterFragmentArgs(phoneNumber)
-            val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-                .apply {
-                    setGraph(R.navigation.nav_graph)
-                    setCurrentDestination(R.id.registerFragment)
-                }
 
-            launchFragmentInHiltContainer<RegisterFragment>(
-                args.toBundle(),
-                R.style.Theme_Telegram
-            ) {
-                Navigation.setViewNavController(requireView(), navController)
-            }
+            val navController = launchFragmentAndGetNavController(args)
 
             val firstName = "John"
             val lastName = "Doe"
@@ -95,4 +88,11 @@ class RegisterFragmentTest {
             // chats fragment is displayed
             assertThat(navController.currentDestination?.id, `is`(R.id.chatsFragment))
         }
+
+    private fun launchFragmentAndGetNavController(args: RegisterFragmentArgs): NavController {
+        val navController = getTestNavController(R.id.registerFragment)
+        contentProvider.navcontroller = navController
+        launchFragmentInHiltContainer<RegisterFragment>(args.toBundle(), R.style.Theme_Telegram)
+        return navController
+    }
 }

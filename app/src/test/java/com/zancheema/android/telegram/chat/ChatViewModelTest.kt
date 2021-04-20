@@ -25,8 +25,7 @@ class ChatViewModelTest {
 
     private val sender = UserDetail("+13434589734", "John", "Doe")
     private val receiver = UserDetail("+32579459634", "John", "Doe")
-    private val chat =
-        Chat("chat_room", "http://example.com", receiver.firstName, receiver.phoneNumber, "")
+    private val chatRoom = ChatRoom("chat_room", receiver.phoneNumber)
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -48,7 +47,7 @@ class ChatViewModelTest {
             saveUserDetail(sender)
             saveUserDetail(receiver)
 
-            saveChatRoom(ChatRoom(chat.chatRoomId, chat.phoneNumber))
+            saveChatRoom(chatRoom)
         }
     }
 
@@ -79,9 +78,9 @@ class ChatViewModelTest {
     fun messages_ChatIsNull_GeneratesInvalidChatEventAndReturnsChatMessagesAsEmptyList() =
         runBlockingTest {
             val messages = listOf(
-                ChatMessage("msg_1", chat.chatRoomId, "Hello"),
-                ChatMessage("msg_1", chat.chatRoomId, "Hey", isMine = false),
-                ChatMessage("msg_1", chat.chatRoomId, "How's it going?")
+                ChatMessage("msg_1", chatRoom.id, "Hello"),
+                ChatMessage("msg_1", chatRoom.id, "Hey", isMine = false),
+                ChatMessage("msg_1", chatRoom.id, "How's it going?")
             )
             messages.forEach { repository.saveChatMessage(it) }
 
@@ -97,12 +96,12 @@ class ChatViewModelTest {
     @ExperimentalCoroutinesApi
     @Test
     fun messages_ChatNotNull_ReturnsChatMessagesWithChatRoomId() = runBlockingTest {
-        viewModel.chat.value = chat
+        viewModel.setChatRoomId(chatRoom.id)
 
         val messages = listOf(
-            ChatMessage("msg_1", chat.chatRoomId, "Hello"),
-            ChatMessage("msg_2", chat.chatRoomId, "Hey", isMine = false),
-            ChatMessage("msg_3", chat.chatRoomId, "How's it going?")
+            ChatMessage("msg_1", chatRoom.id, "Hello"),
+            ChatMessage("msg_2", chatRoom.id, "Hey", isMine = false),
+            ChatMessage("msg_3", chatRoom.id, "How's it going?")
         )
         messages.forEach { repository.saveChatMessage(it) }
 
@@ -115,14 +114,14 @@ class ChatViewModelTest {
     @Test
     fun sendingNewMessageAddsChatMessageToMessages() = runBlockingTest {
         val message = "Hello"
-        viewModel.chat.value = chat
+        viewModel.setChatRoomId(chatRoom.id)
         viewModel.messageText.value = message
         viewModel.sendMessage()
 
         val loaded = viewModel.chatMessages.first()
         assertThat(loaded.size, `is`(1))
         assertThat(loaded[0].message, `is`(message))
-        assertThat(loaded[0].chatRoomId, `is`(chat.chatRoomId))
+        assertThat(loaded[0].chatRoomId, `is`(chatRoom.id))
         assertThat(loaded[0].isMine, `is`(true))
     }
 }

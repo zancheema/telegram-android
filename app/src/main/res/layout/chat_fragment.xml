@@ -10,8 +10,8 @@
             type="com.zancheema.android.telegram.chat.ChatViewModel" />
 
         <variable
-            name="chat"
-            type="com.zancheema.android.telegram.data.source.domain.Chat" />
+            name="userDetail"
+            type="com.zancheema.android.telegram.data.source.domain.UserDetail" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,7 +41,7 @@
                     android:scaleType="fitCenter"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:photo_url="@{chat.photoUrl}"
+                    app:photo_url="@{userDetail.photoUrl}"
                     app:srcCompat="@drawable/ic_baseline_person_24" />
 
                 <TextView
@@ -49,7 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="@{chat.userName}"
+                    android:text="@{userDetail.fullName}"
                     android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="@id/ivChat"
                     app:layout_constraintStart_toEndOf="@id/ivChat"

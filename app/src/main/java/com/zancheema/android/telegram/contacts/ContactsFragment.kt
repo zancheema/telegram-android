@@ -42,7 +42,7 @@ class ContactsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewDataBinding.lifecycleOwner = viewLifecycleOwner
         setUpContactList()
-        setUpToolbar()
+        navigation()
 
         checkSelfPermission()
     }
@@ -74,8 +74,8 @@ class ContactsFragment : Fragment() {
         }
     }
 
-    private fun setUpToolbar() {
-        val navController = findNavController()
+    private fun navigation() {
+        val navController = contentProvider.findNavController(this)
         val appBarConfiguration = AppBarConfiguration(navController.graph)
 
         viewDataBinding.toolbar

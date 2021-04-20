@@ -11,7 +11,7 @@ import java.util.*
 object CommonBindings {
     @BindingAdapter("photo_url")
     @JvmStatic
-    fun setPhotoUrl(imageView: ImageView, url: String) {
+    fun setPhotoUrl(imageView: ImageView, url: String?) {
         Glide
             .with(imageView.context)
             .load(url)

@@ -7,9 +7,7 @@ import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.*
 import com.zancheema.android.telegram.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -178,11 +176,14 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override suspend fun getChatRooms(forceUpdate: Boolean): Result<List<ChatRoom>> {
-        TODO("Not yet implemented")
+        return Success(observableChatRooms.first())
     }
 
     override suspend fun getChatRoom(id: String, forceUpdate: Boolean): Result<ChatRoom> {
-        TODO("Not yet implemented")
+        if (forceUpdate) refreshChatRoom(id)
+        val room = observableChatRooms.first().firstOrNull { it.id == id }
+            ?: return Error(Exception())
+        return Success(room)
     }
 
     override suspend fun getChats(forceUpdate: Boolean): Result<List<Chat>> {
