@@ -8,14 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.databinding.ListItemContactBinding
 
-class ContactListAdapter :
-    ListAdapter<UserDetail, ContactListAdapter.ViewHolder>(UserDetailDiffUtil()) {
+class ContactListAdapter(
+    private val viewModel: ContactsViewModel
+) : ListAdapter<UserDetail, ContactListAdapter.ViewHolder>(UserDetailDiffUtil()) {
 
     class ViewHolder private constructor(
         private val binding: ListItemContactBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(detail: UserDetail) {
+        fun bind(detail: UserDetail, viewModel: ContactsViewModel) {
             binding.userDetail = detail
+            binding.viewModel = viewModel
+
+            binding.executePendingBindings()
         }
 
         companion object {
@@ -32,7 +36,7 @@ class ContactListAdapter :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), viewModel)
     }
 }
 

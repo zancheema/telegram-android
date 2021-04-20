@@ -13,6 +13,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -91,5 +92,14 @@ class ContactsViewModelTest {
         assertThat(loaded.data.size, `is`(2))
         assertThat(loaded.data[0].phoneNumber, `is`(user2.phoneNumber))
         assertThat(loaded.data[1].phoneNumber, `is`(user3.phoneNumber))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun openChatGeneratesOpenChatEvent() = runBlockingTest {
+        viewModel.openChat(userDetail2)
+
+        val event = viewModel.openChatEvent.first()
+        assertThat(event?.getContentIfNotHandled(), `is`(notNullValue()))
     }
 }

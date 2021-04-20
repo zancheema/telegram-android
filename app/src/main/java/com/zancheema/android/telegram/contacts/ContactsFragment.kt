@@ -10,9 +10,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.zancheema.android.telegram.EventObserver
+import com.zancheema.android.telegram.contacts.ContactsFragmentDirections.Companion.actionContactsFragmentToChatFragment
 import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.databinding.ContactsFragmentBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,7 +43,7 @@ class ContactsFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewDataBinding.lifecycleOwner = viewLifecycleOwner
         setUpContactList()
-        navigation()
+        setUpNavigation()
 
         checkSelfPermission()
     }
@@ -74,12 +75,19 @@ class ContactsFragment : Fragment() {
         }
     }
 
-    private fun navigation() {
+    private fun setUpNavigation() {
         val navController = contentProvider.findNavController(this)
         val appBarConfiguration = AppBarConfiguration(navController.graph)
 
+        // Set up toolbar with respect to NavGraph
         viewDataBinding.toolbar
             .setupWithNavController(navController, appBarConfiguration)
+
+        // Set up navigation event listeners
+        viewModel.openChatEvent.asLiveData()
+            .observe(viewLifecycleOwner, EventObserver { chatRoomId ->
+                navController.navigate(actionContactsFragmentToChatFragment(chatRoomId))
+            })
     }
 
     private fun setUpContacts() {
@@ -89,7 +97,7 @@ class ContactsFragment : Fragment() {
 
     @FlowPreview
     private fun setUpContactList() {
-        val adapter = ContactListAdapter()
+        val adapter = ContactListAdapter(viewModel)
         viewDataBinding.contactList.adapter = adapter
         viewModel.userDetails.asLiveData().observe(viewLifecycleOwner) { userDetails ->
             adapter.submitList(userDetails)
