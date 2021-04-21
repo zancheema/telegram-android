@@ -1,4 +1,4 @@
-package com.zancheema.android.telegram.local.dao
+package com.zancheema.android.telegram.source.local.dao
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
@@ -51,6 +51,17 @@ class UserDetailDaoTest {
 
     @After
     fun closeDb() = database.close()
+
+    @Test
+    fun insertAndGetAllUserDetails() = runBlockingTest {
+        val details = listOf(
+            DbUserDetail(user.phoneNumber, "John", "Doe", "https://example.com")
+        )
+        for (d in details) database.userDetailDao().insertUserDetail(d)
+
+        val loaded = database.userDetailDao().getAll()
+        assertThat(loaded, `is`(details))
+    }
 
     @ExperimentalCoroutinesApi
     @Test

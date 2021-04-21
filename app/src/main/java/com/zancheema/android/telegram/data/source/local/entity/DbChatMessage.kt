@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
+import com.zancheema.android.telegram.data.source.domain.ChatMessage
 
 @Entity(
     tableName = "chat_messages",
@@ -23,4 +24,12 @@ data class DbChatMessage(
     @ColumnInfo(name = "message") val message: String,
     @ColumnInfo(name = "is_mine") val isMine: Boolean = true,
     @ColumnInfo(name = "timestamp") val timestamp: Long = System.currentTimeMillis()
+)
+
+fun DbChatMessage.asDomainModel() = ChatMessage(
+    id = id,
+    chatRoomId = chatRoomId,
+    message = message,
+    isMine = isMine,
+    timestamp = timestamp
 )

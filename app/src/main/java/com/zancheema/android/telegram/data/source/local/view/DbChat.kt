@@ -2,6 +2,7 @@ package com.zancheema.android.telegram.data.source.local.view
 
 import androidx.room.ColumnInfo
 import androidx.room.DatabaseView
+import com.zancheema.android.telegram.data.source.domain.Chat
 
 @DatabaseView(
     value = """
@@ -29,4 +30,13 @@ data class DbChat(
     @ColumnInfo(name = "phone_number") val phoneNumber: String,
     @ColumnInfo(name = "recent_message") val recentMessage: String,
     @ColumnInfo(name = "timestamp") val timestamp: Long
+)
+
+fun DbChat.asDomainModel() = Chat(
+    chatRoomId = chatRoomId,
+    photoUrl = photoUrl,
+    userName = userName,
+    phoneNumber = phoneNumber,
+    recentMessage = recentMessage,
+    timestamp = timestamp
 )

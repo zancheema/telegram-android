@@ -1,9 +1,6 @@
 package com.zancheema.android.telegram.data.source.local.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.zancheema.android.telegram.data.source.local.entity.DbUser
 
 @Dao
@@ -14,8 +11,11 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE phone_number = :phoneNumber")
     suspend fun getUserByPhoneNumber(phoneNumber: String): DbUser?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertUser(user: DbUser)
+
+    @Query("DELETE FROM users")
+    suspend fun deleteAll()
 
     @Delete
     suspend fun deleteUser(user: DbUser)

@@ -1,4 +1,4 @@
-package com.zancheema.android.telegram.local.dao
+package com.zancheema.android.telegram.source.local.dao
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room

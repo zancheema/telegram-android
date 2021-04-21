@@ -7,10 +7,12 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.R
+import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.domain.ChatMessage
 import com.zancheema.android.telegram.data.source.domain.ChatRoom
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
+import com.zancheema.android.telegram.data.succeeded
 import com.zancheema.android.telegram.di.AppContentModule
 import com.zancheema.android.telegram.getTestNavController
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
@@ -23,6 +25,8 @@ import com.zancheema.android.telegram.util.saveUserDetailBlocking
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.`is`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,7 +84,7 @@ class ChatFragmentTest {
     }
 
     @Test
-    fun typeAndSendMessage_MessageIsDisplayedInMessageList() {
+    fun typeAndSendMessage_MessageIsDisplayedInMessageListAndSavedInRepository() = runBlocking {
         launchChat()
         val message = "Hey there!"
 
@@ -93,6 +97,12 @@ class ChatFragmentTest {
             .check(matches(hasDescendant(withText(message))))
         onView(withId(R.id.etMessage))
             .check(matches(withText("")))
+
+        val loaded = repository.getChatMessages(true)
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data.size, `is`(1))
+        assertThat(loaded.data[0].message, `is`(message))
     }
 
     @Test

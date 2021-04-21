@@ -3,6 +3,7 @@ package com.zancheema.android.telegram.data.source.local.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy.IGNORE
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import com.zancheema.android.telegram.data.source.local.entity.DbChatMessage
@@ -18,7 +19,7 @@ interface ChatMessageDao {
     @Query("SELECT * FROM chat_messages WHERE id = :id")
     suspend fun getById(id: String): DbChatMessage?
 
-    @Insert(onConflict = REPLACE)
+    @Insert(onConflict = IGNORE)
     suspend fun insert(message: DbChatMessage)
 
     @Query("DELETE FROM chat_messages")

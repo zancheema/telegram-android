@@ -191,7 +191,8 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override suspend fun getChatMessages(forceUpdate: Boolean): Result<List<ChatMessage>> {
-        TODO("Not yet implemented")
+        if (forceUpdate) refreshChatMessages()
+        return Success(observableChatMessages.first())
     }
 
     override suspend fun getChatMessages(

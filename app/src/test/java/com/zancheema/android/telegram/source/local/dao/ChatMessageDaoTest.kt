@@ -1,4 +1,4 @@
-package com.zancheema.android.telegram.local.dao
+package com.zancheema.android.telegram.source.local.dao
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
@@ -109,7 +109,7 @@ class ChatMessageDaoTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun insertingSameChatMessageTwiceReplaceFirstChatMessage() = runBlockingTest {
+    fun insertingSameChatMessageTwiceIsIgnored() = runBlockingTest {
         val chatMessage = DbChatMessage("msg_1", chatRoom1.id, "Hello")
         database.chatMessageDao().insert(chatMessage)
 
@@ -117,8 +117,8 @@ class ChatMessageDaoTest {
         database.chatMessageDao().insert(updatedChatMessage)
 
         val loaded = database.chatMessageDao().getById(chatMessage.id)
-        assertThat(loaded, `is`(not(chatMessage)))
-        assertThat(loaded, `is`(updatedChatMessage))
+        assertThat(loaded, `is`(not(updatedChatMessage)))
+        assertThat(loaded, `is`(chatMessage))
     }
 
     @ExperimentalCoroutinesApi
