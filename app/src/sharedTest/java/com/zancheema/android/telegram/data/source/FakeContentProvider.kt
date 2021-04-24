@@ -1,4 +1,4 @@
-package com.zancheema.android.telegram.source
+package com.zancheema.android.telegram.data.source
 
 import android.content.ContentResolver
 import androidx.fragment.app.Fragment

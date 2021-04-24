@@ -18,8 +18,8 @@ import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.di.AppContentModule
-import com.zancheema.android.telegram.source.FakeContentProvider
-import com.zancheema.android.telegram.source.FakeRepository
+import com.zancheema.android.telegram.data.source.FakeContentProvider
+import com.zancheema.android.telegram.data.source.FakeRepository
 import com.zancheema.android.telegram.util.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

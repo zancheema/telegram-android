@@ -1,7 +1,7 @@
 package com.zancheema.android.telegram.chats
 
+import com.zancheema.android.telegram.data.source.FakeRepository
 import com.zancheema.android.telegram.data.source.domain.Chat
-import com.zancheema.android.telegram.source.FakeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest

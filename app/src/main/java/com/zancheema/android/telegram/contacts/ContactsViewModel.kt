@@ -44,7 +44,6 @@ class ContactsViewModel @Inject constructor(
 
     fun setContactNumbers(phoneNumbers: List<String>) {
         viewModelScope.launch {
-            repository.refreshUsers(phoneNumbers)
             repository.refreshUserDetails(phoneNumbers)
 
             for (number in phoneNumbers) {

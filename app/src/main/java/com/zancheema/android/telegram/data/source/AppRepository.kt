@@ -9,10 +9,6 @@ interface AppRepository {
 
     suspend fun getUsers(): Result<List<User>>
 
-    suspend fun refreshUsers()
-
-    suspend fun refreshUsers(phoneNumbers: List<String>)
-
     suspend fun refreshUser(phoneNumber: String)
 
     fun observeUserDetails(): Flow<Result<List<UserDetail>>>

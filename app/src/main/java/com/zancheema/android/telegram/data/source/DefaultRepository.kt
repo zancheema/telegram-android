@@ -1,10 +1,22 @@
 package com.zancheema.android.telegram.data.source
 
+import android.util.Log
 import com.zancheema.android.telegram.data.Result
+import com.zancheema.android.telegram.data.Result.Error
+import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.domain.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
-class DefaultRepository : AppRepository {
+private const val TAG = "DefaultRepository"
+
+class DefaultRepository(
+    private val remoteDataSource: AppDataSource,
+    private val localDataSource: AppDataSource,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : AppRepository {
+
     override suspend fun getUserDetails(forceUpdate: Boolean): Result<List<UserDetail>> {
         TODO("Not yet implemented")
     }
@@ -46,15 +58,13 @@ class DefaultRepository : AppRepository {
     }
 
     override suspend fun getUsers(): Result<List<User>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun refreshUsers() {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun refreshUsers(phoneNumbers: List<String>) {
-        TODO("Not yet implemented")
+        return try {
+//            Success(localDataSource.getUsers())
+            TODO("Not yet implemented")
+        } catch (e: Exception) {
+            Log.w(TAG, "getUsers: ", e)
+            Error(e)
+        }
     }
 
     override suspend fun refreshUserDetails(phoneNumbers: List<String>) {

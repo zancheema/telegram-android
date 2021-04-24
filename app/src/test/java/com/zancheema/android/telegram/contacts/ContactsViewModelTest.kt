@@ -6,8 +6,8 @@ import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.data.succeeded
-import com.zancheema.android.telegram.source.FakeContentProvider
-import com.zancheema.android.telegram.source.FakeRepository
+import com.zancheema.android.telegram.data.source.FakeContentProvider
+import com.zancheema.android.telegram.data.source.FakeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first

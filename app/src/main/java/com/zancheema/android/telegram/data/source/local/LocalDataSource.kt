@@ -1,5 +1,9 @@
 package com.zancheema.android.telegram.data.source.local
 
+import android.util.Log
+import com.zancheema.android.telegram.data.Result
+import com.zancheema.android.telegram.data.Result.Error
+import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.AppDataSource
 import com.zancheema.android.telegram.data.source.domain.*
 import com.zancheema.android.telegram.data.source.local.entity.asDomainModel
@@ -9,114 +13,185 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
+private const val TAG = "LocalDataSource"
+
 class LocalDataSource(
     private val database: AppDatabase,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AppDataSource {
-    override fun observeUsers(): Flow<List<User>> {
+    override fun observeUsers(): Flow<Result<List<User>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUsers(): List<User> {
-        return database.userDao().getAll()
-            .map { it.asDomainModel() }
+    override suspend fun getUsers(): Result<List<User>> {
+        return try {
+            val users = database.userDao().getAll()
+                .map { it.asDomainModel() }
+            Success(users)
+        } catch (e: Exception) {
+            Log.w(TAG, "getUsers: ", e)
+            Error(e)
+        }
     }
 
-    override fun observeUserDetails(): Flow<List<UserDetail>> {
+    override fun observeUserDetails(): Flow<Result<List<UserDetail>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUserDetails(): List<UserDetail> {
-        return database.userDetailDao().getAll()
-            .map { it.asDomainModel() }
+    override suspend fun getUserDetails(): Result<List<UserDetail>> {
+        return try {
+            val details = database.userDetailDao().getAll()
+                .map { it.asDomainModel() }
+            Success(details)
+        } catch (e: Exception) {
+            Log.w(TAG, "getUserDetails: ", e)
+            Error(e)
+        }
     }
 
-    override fun observeUserDetails(phoneNumbers: List<String>): Flow<List<UserDetail>> {
+    override fun observeUserDetails(phoneNumbers: List<String>): Flow<Result<List<UserDetail>>> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getUserDetails(
         phoneNumbers: List<String>
-    ): List<UserDetail> {
-        return database.userDetailDao()
-            .getUserDetailsByPhoneNumbers(phoneNumbers)
-            .map { it.asDomainModel() }
+    ): Result<List<UserDetail>> {
+        return try {
+            val details = database.userDetailDao()
+                .getUserDetailsByPhoneNumbers(phoneNumbers)
+                .map { it.asDomainModel() }
+            Success(details)
+        } catch (e: Exception) {
+            Log.w(TAG, "getUserDetails(phoneNumbers): ", e)
+            Error(e)
+        }
     }
 
-    override fun observeUserDetail(phoneNumber: String): Flow<UserDetail?> {
+    override fun observeUserDetail(phoneNumber: String): Flow<Result<UserDetail>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUserDetail(phoneNumber: String): UserDetail? {
-        return database.userDetailDao()
-            .getUserDetailByPhoneNumber(phoneNumber)
-            ?.asDomainModel()
+    override suspend fun getUserDetail(phoneNumber: String): Result<UserDetail> {
+        return try {
+            val detail = database.userDetailDao()
+                .getUserDetailByPhoneNumber(phoneNumber)
+                ?.asDomainModel()
+                ?: error("User Detail not found")
+            Success(detail)
+        } catch (e: Exception) {
+            Log.w(TAG, "getUserDetail(phoneNumbers): ", e)
+            Error(e)
+        }
     }
 
-    override fun observeChatRooms(): Flow<List<ChatRoom>> {
+    override fun observeChatRooms(): Flow<Result<List<ChatRoom>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatRooms(): List<ChatRoom> {
-        return database.chatRoomDao()
-            .getAll()
-            .map { it.asDomainModel() }
+    override suspend fun getChatRooms(): Result<List<ChatRoom>> {
+        return try {
+            val rooms = database.chatRoomDao()
+                .getAll()
+                .map { it.asDomainModel() }
+            Success(rooms)
+        } catch (e: Exception) {
+            Log.w(TAG, "getChatRooms: ", e)
+            Error(e)
+        }
     }
 
-    override fun observeChatRoom(id: String): Flow<ChatRoom?> {
+    override fun observeChatRoom(id: String): Flow<Result<ChatRoom>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatRoom(id: String): ChatRoom? {
-        return database.chatRoomDao()
-            .getById(id)
-            ?.asDomainModel()
+    override suspend fun getChatRoom(id: String): Result<ChatRoom> {
+        return try {
+            val rooms = database.chatRoomDao()
+                .getById(id)
+                ?.asDomainModel()
+                ?: error("Chat room not found")
+            Success(rooms)
+        } catch (e: Exception) {
+            Log.w(TAG, "getChatRooms: ", e)
+            Error(e)
+        }
     }
 
-    override fun observeChats(): Flow<List<Chat>> {
+    override fun observeChats(): Flow<Result<List<Chat>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChats(): List<Chat> {
-        return database.chatRoomDao()
-            .getAllChats()
-            .map { it.asDomainModel() }
+    override suspend fun getChats(): Result<List<Chat>> {
+        return try {
+            val chats = database.chatRoomDao()
+                .getAllChats()
+                .map { it.asDomainModel() }
+            return Success(chats)
+        } catch (e: Exception) {
+            Log.w(TAG, "getChats: ", e)
+            Error(e)
+        }
     }
 
-    override fun observeChatMessages(): Flow<List<ChatMessage>> {
+    override fun observeChatMessages(): Flow<Result<List<ChatMessage>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatMessages(): List<ChatMessage> {
-        return database.chatMessageDao()
-            .getAll()
-            .map { it.asDomainModel() }
+    override suspend fun getChatMessages(): Result<List<ChatMessage>> {
+        return try {
+            val messages = database.chatMessageDao()
+                .getAll()
+                .map { it.asDomainModel() }
+            Success(messages)
+        } catch (e: Exception) {
+            Log.w(TAG, "getChatMessages: ", e)
+            Error(e)
+        }
     }
 
-    override fun observeChatMessages(chatRoomId: String): Flow<List<ChatMessage>> {
+    override fun observeChatMessages(chatRoomId: String): Flow<Result<List<ChatMessage>>> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getChatMessages(
         chatRoomId: String
-    ): List<ChatMessage> {
-        return database.chatMessageDao()
-            .getByChatRoomId(chatRoomId)
-            .map { it.asDomainModel() }
+    ): Result<List<ChatMessage>> {
+        return try {
+            val messages = database.chatMessageDao()
+                .getByChatRoomId(chatRoomId)
+                .map { it.asDomainModel() }
+            Success(messages)
+        } catch (e: Exception) {
+            Log.w(TAG, "getChatMessages: ", e)
+            Error(e)
+        }
     }
 
-    override fun observeChatMessage(id: String): Flow<ChatMessage?> {
+    override fun observeChatMessage(id: String): Flow<Result<ChatMessage>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getChatMessage(id: String): ChatMessage? {
-        return database.chatMessageDao()
-            .getById(id)
-            ?.asDomainModel()
+    override suspend fun getChatMessage(id: String): Result<ChatMessage> {
+        return try {
+            val message = database.chatMessageDao()
+                .getById(id)
+                ?.asDomainModel()
+                ?: error("chat message not found")
+            Success(message)
+        } catch (e: Exception) {
+            Log.w(TAG, "getChatMessage: ", e)
+            Error(e)
+        }
     }
 
-    override suspend fun isRegistered(phoneNumber: String): Boolean {
-        return database.userDetailDao().getUserDetailByPhoneNumber(phoneNumber) != null
+    override suspend fun isRegistered(phoneNumber: String): Result<Boolean> {
+        return try {
+            val detail = database.userDetailDao().getUserDetailByPhoneNumber(phoneNumber)
+            Success(detail != null)
+        } catch (e: Exception) {
+            Log.w(TAG, "isRegistered: ", e)
+            Error(e)
+        }
     }
 
     override suspend fun saveUser(user: User) = withContext(ioDispatcher) {

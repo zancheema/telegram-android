@@ -3,8 +3,8 @@ package com.zancheema.android.telegram
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.zancheema.android.telegram.MainViewModel.AuthState
 import com.zancheema.android.telegram.data.source.domain.UserDetail
-import com.zancheema.android.telegram.source.FakeContentProvider
-import com.zancheema.android.telegram.source.FakeRepository
+import com.zancheema.android.telegram.data.source.FakeContentProvider
+import com.zancheema.android.telegram.data.source.FakeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest

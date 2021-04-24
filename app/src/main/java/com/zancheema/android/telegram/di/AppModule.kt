@@ -1,23 +1,79 @@
 package com.zancheema.android.telegram.di
 
-import com.zancheema.android.telegram.data.source.AppRepository
-import com.zancheema.android.telegram.data.source.DefaultRepository
-import com.zancheema.android.telegram.data.source.AppContentProvider
-import com.zancheema.android.telegram.data.source.DefaultContentProvider
-import dagger.Binds
+import android.content.Context
+import androidx.room.Room
+import com.zancheema.android.telegram.data.source.*
+import com.zancheema.android.telegram.data.source.local.AppDatabase
+import com.zancheema.android.telegram.data.source.local.LocalDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.annotation.AnnotationRetention.RUNTIME
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule  {
+    @Qualifier
+    @Retention(RUNTIME)
+    annotation class RemoteAppDataSource
+
+    @Qualifier
+    @Retention(RUNTIME)
+    annotation class LocalAppDataSource
+
+    @Singleton
+    @RemoteAppDataSource
+    @Provides
+    fun provideRemoteDataSource(): AppDataSource {
+        return RemoteDataSource()
+    }
+
+    @Singleton
+    @LocalAppDataSource
+    @Provides
+    fun provideLocalDataSource(
+        database: AppDatabase,
+        ioDispatcher: CoroutineDispatcher
+    ): AppDataSource {
+        return LocalDataSource(database, ioDispatcher)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java,
+            "Telegram.db"
+        ).build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideIoDispatcher(): CoroutineDispatcher {
+        return Dispatchers.IO
+    }
+}
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppContentModule {
     @Singleton
     @Provides
-    fun provideAppRepository(): AppRepository {
-        return DefaultRepository()
+    fun provideAppRepository(
+        @AppModule.RemoteAppDataSource remoteDataSource: AppDataSource,
+        @AppModule.LocalAppDataSource localDataSource: AppDataSource,
+        ioDispatcher: CoroutineDispatcher
+    ): AppRepository {
+        return DefaultRepository(
+            remoteDataSource, localDataSource, ioDispatcher
+        )
     }
 
     @Singleton

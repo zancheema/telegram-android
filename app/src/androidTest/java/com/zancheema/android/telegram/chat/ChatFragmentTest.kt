@@ -8,6 +8,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.Result.Success
+import com.zancheema.android.telegram.data.source.FakeContentProvider
+import com.zancheema.android.telegram.data.source.FakeRepository
 import com.zancheema.android.telegram.data.source.domain.ChatMessage
 import com.zancheema.android.telegram.data.source.domain.ChatRoom
 import com.zancheema.android.telegram.data.source.domain.User
@@ -16,8 +18,6 @@ import com.zancheema.android.telegram.data.succeeded
 import com.zancheema.android.telegram.di.AppContentModule
 import com.zancheema.android.telegram.getTestNavController
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
-import com.zancheema.android.telegram.source.FakeContentProvider
-import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.saveChatMessageBlocking
 import com.zancheema.android.telegram.util.saveChatRoomBlocking
 import com.zancheema.android.telegram.util.saveUserBlocking

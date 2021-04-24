@@ -1,56 +1,57 @@
 package com.zancheema.android.telegram.data.source
 
+import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.source.domain.*
 import kotlinx.coroutines.flow.Flow
 
 interface AppDataSource {
-    fun observeUsers(): Flow<List<User>>
+    fun observeUsers(): Flow<Result<List<User>>>
 
-    suspend fun getUsers(): List<User>
+    suspend fun getUsers(): Result<List<User>>
 
-    fun observeUserDetails(): Flow<List<UserDetail>>
+    fun observeUserDetails(): Flow<Result<List<UserDetail>>>
 
-    suspend fun getUserDetails(): List<UserDetail>
+    suspend fun getUserDetails(): Result<List<UserDetail>>
 
-    fun observeUserDetails(phoneNumbers: List<String>): Flow<List<UserDetail>>
+    fun observeUserDetails(phoneNumbers: List<String>): Flow<Result<List<UserDetail>>>
 
     suspend fun getUserDetails(
         phoneNumbers: List<String>
-    ): List<UserDetail>
+    ): Result<List<UserDetail>>
 
-    fun observeUserDetail(phoneNumber: String): Flow<UserDetail?>
+    fun observeUserDetail(phoneNumber: String): Flow<Result<UserDetail>>
 
     suspend fun getUserDetail(
         phoneNumber: String
-    ): UserDetail?
+    ): Result<UserDetail>
 
-    fun observeChatRooms(): Flow<List<ChatRoom>>
+    fun observeChatRooms(): Flow<Result<List<ChatRoom>>>
 
-    suspend fun getChatRooms(): List<ChatRoom>
+    suspend fun getChatRooms(): Result<List<ChatRoom>>
 
-    fun observeChatRoom(id: String): Flow<ChatRoom?>
+    fun observeChatRoom(id: String): Flow<Result<ChatRoom>>
 
-    suspend fun getChatRoom(id: String): ChatRoom?
+    suspend fun getChatRoom(id: String): Result<ChatRoom>
 
-    fun observeChats(): Flow<List<Chat>>
+    fun observeChats(): Flow<Result<List<Chat>>>
 
-    suspend fun getChats(): List<Chat>
+    suspend fun getChats(): Result<List<Chat>>
 
-    fun observeChatMessages(): Flow<List<ChatMessage>>
+    fun observeChatMessages(): Flow<Result<List<ChatMessage>>>
 
-    suspend fun getChatMessages(): List<ChatMessage>
+    suspend fun getChatMessages(): Result<List<ChatMessage>>
 
-    fun observeChatMessages(chatRoomId: String): Flow<List<ChatMessage>>
+    fun observeChatMessages(chatRoomId: String): Flow<Result<List<ChatMessage>>>
 
     suspend fun getChatMessages(
         chatRoomId: String
-    ): List<ChatMessage>
+    ): Result<List<ChatMessage>>
 
-    fun observeChatMessage(id: String): Flow<ChatMessage?>
+    fun observeChatMessage(id: String): Flow<Result<ChatMessage>>
 
-    suspend fun getChatMessage(id: String): ChatMessage?
+    suspend fun getChatMessage(id: String): Result<ChatMessage>
 
-    suspend fun isRegistered(phoneNumber: String): Boolean
+    suspend fun isRegistered(phoneNumber: String): Result<Boolean>
 
     suspend fun saveUser(user: User)
 

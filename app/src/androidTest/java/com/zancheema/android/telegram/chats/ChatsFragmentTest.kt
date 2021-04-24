@@ -10,13 +10,13 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.R
+import com.zancheema.android.telegram.data.source.FakeContentProvider
+import com.zancheema.android.telegram.data.source.FakeRepository
 import com.zancheema.android.telegram.data.source.domain.Chat
 import com.zancheema.android.telegram.data.source.domain.UserDetail
 import com.zancheema.android.telegram.di.AppContentModule
 import com.zancheema.android.telegram.getTestNavController
 import com.zancheema.android.telegram.launchFragmentInHiltContainer
-import com.zancheema.android.telegram.source.FakeContentProvider
-import com.zancheema.android.telegram.source.FakeRepository
 import com.zancheema.android.telegram.util.saveUserDetailBlocking
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

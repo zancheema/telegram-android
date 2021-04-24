@@ -1,13 +1,15 @@
-package com.zancheema.android.telegram.source
+package com.zancheema.android.telegram.data.source
 
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
-import com.zancheema.android.telegram.data.source.AppRepository
 import com.zancheema.android.telegram.data.source.domain.*
 import com.zancheema.android.telegram.util.wrapEspressoIdlingResource
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -71,11 +73,11 @@ class FakeRepository @Inject constructor() : AppRepository {
         observableUsers.value = tmp
     }
 
-    override suspend fun refreshUsers() {
+    private fun refreshUsers() {
         observableUsers.value = usersServiceData.values.toList()
     }
 
-    override suspend fun refreshUsers(phoneNumbers: List<String>) {
+    private fun refreshUsers(phoneNumbers: List<String>) {
         val previousUsers = observableUsers.value.toMutableList()
         previousUsers.removeIf { phoneNumbers.contains(it.phoneNumber) }
         val filtered = usersServiceData

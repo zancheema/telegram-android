@@ -5,9 +5,9 @@ import com.zancheema.android.telegram.MainCoroutineRule
 import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
+import com.zancheema.android.telegram.data.source.FakeRepository
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.succeeded
-import com.zancheema.android.telegram.source.FakeRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest

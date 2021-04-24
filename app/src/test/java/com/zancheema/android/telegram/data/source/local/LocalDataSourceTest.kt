@@ -6,10 +6,13 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.zancheema.android.telegram.MainCoroutineRule
+import com.zancheema.android.telegram.data.Result.Error
+import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.domain.ChatMessage
 import com.zancheema.android.telegram.data.source.domain.ChatRoom
 import com.zancheema.android.telegram.data.source.domain.User
 import com.zancheema.android.telegram.data.source.domain.UserDetail
+import com.zancheema.android.telegram.data.succeeded
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,7 +72,9 @@ class LocalDataSourceTest {
         for (u in users) localDataSource.saveUser(u)
 
         val loaded = localDataSource.getUsers()
-        assertThat(loaded, `is`(users))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(users))
     }
 
     @ExperimentalCoroutinesApi
@@ -87,7 +92,9 @@ class LocalDataSourceTest {
         for (d in userDetails) localDataSource.saveUserDetail(d)
 
         val loaded = localDataSource.getUserDetails()
-        assertThat(loaded, `is`(userDetails))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(userDetails))
     }
 
     @ExperimentalCoroutinesApi
@@ -110,7 +117,9 @@ class LocalDataSourceTest {
         val selectedPhoneNumbers: List<String> = selectedUserDetails.map { it.phoneNumber }
 
         val loaded = localDataSource.getUserDetails(selectedPhoneNumbers)
-        assertThat(loaded, `is`(selectedUserDetails))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(selectedUserDetails))
     }
 
     @ExperimentalCoroutinesApi
@@ -129,7 +138,9 @@ class LocalDataSourceTest {
 
         val selectedUserDetail = userDetails[1]
         val loaded = localDataSource.getUserDetail(selectedUserDetail.phoneNumber)
-        assertThat(loaded, `is`(selectedUserDetail))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(selectedUserDetail))
     }
 
     @ExperimentalCoroutinesApi
@@ -139,10 +150,16 @@ class LocalDataSourceTest {
         val userDetail = UserDetail(user.phoneNumber, "John", "Doe")
         localDataSource.saveUser(user)
 
-        assertThat(localDataSource.isRegistered(user.phoneNumber), `is`(false))
+        var loaded = localDataSource.isRegistered(user.phoneNumber)
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(false))
 
         localDataSource.saveUserDetail(userDetail)
-        assertThat(localDataSource.isRegistered(user.phoneNumber), `is`(true))
+        loaded = localDataSource.isRegistered(user.phoneNumber)
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(true))
     }
 
     @ExperimentalCoroutinesApi
@@ -161,7 +178,9 @@ class LocalDataSourceTest {
         for (c in chatRooms) localDataSource.saveChatRoom(c)
 
         val loaded = localDataSource.getChatRooms()
-        assertThat(loaded, `is`(chatRooms))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(chatRooms))
     }
 
     @ExperimentalCoroutinesApi
@@ -181,7 +200,9 @@ class LocalDataSourceTest {
 
         val selectedChatRoom = chatRooms[0]
         val loaded = localDataSource.getChatRoom(selectedChatRoom.id)
-        assertThat(loaded, `is`(selectedChatRoom))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(selectedChatRoom))
     }
 
     @ExperimentalCoroutinesApi
@@ -210,7 +231,9 @@ class LocalDataSourceTest {
         for (m in allMessages) localDataSource.saveChatMessage(m)
 
         val loaded = localDataSource.getChatMessages()
-        assertThat(loaded, `is`(allMessages))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(allMessages))
     }
 
     @ExperimentalCoroutinesApi
@@ -239,9 +262,13 @@ class LocalDataSourceTest {
         for (m in allMessages) localDataSource.saveChatMessage(m)
 
         var loaded = localDataSource.getChatMessages(chatRoom1.id)
-        assertThat(loaded, `is`(chatRoom1Messages))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(chatRoom1Messages))
         loaded = localDataSource.getChatMessages(chatRoom2.id)
-        assertThat(loaded, `is`(chatRoom2Messages))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(chatRoom2Messages))
     }
 
     @ExperimentalCoroutinesApi
@@ -259,7 +286,9 @@ class LocalDataSourceTest {
 
         val selectedMessage = messages[1]
         val loaded = localDataSource.getChatMessage(selectedMessage.id)
-        assertThat(loaded, `is`(selectedMessage))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(selectedMessage))
     }
 
     @ExperimentalCoroutinesApi
@@ -295,9 +324,11 @@ class LocalDataSourceTest {
         for (m in allMessages) localDataSource.saveChatMessage(m)
 
         val loaded = localDataSource.getChats()
-        assertThat(loaded.size, `is`(2))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data.size, `is`(2))
 
-        val chat1 = loaded[1]
+        val chat1 = loaded.data[1]
         assertThat(chat1.chatRoomId, `is`(chatRoom1.id))
         assertThat(chat1.photoUrl, `is`(chatRoom1UserDetail.photoUrl))
         assertThat(chat1.userName, `is`(chatRoom1UserDetail.firstName))
@@ -305,7 +336,7 @@ class LocalDataSourceTest {
         assertThat(chat1.recentMessage, `is`(chatRoom1Messages[1].message))
         assertThat(chat1.timestamp, `is`(chatRoom1Messages[1].timestamp))
 
-        val chat2 = loaded[0]
+        val chat2 = loaded.data[0]
         assertThat(chat2.chatRoomId, `is`(chatRoom2.id))
         assertThat(chat2.photoUrl, `is`(chatRoom2UserDetail.photoUrl))
         assertThat(chat2.userName, `is`(chatRoom2UserDetail.firstName))
@@ -326,8 +357,10 @@ class LocalDataSourceTest {
         localDataSource.saveUserDetail(updateUserDetail)
 
         val loaded = localDataSource.getUserDetail(userDetail.phoneNumber)
-        assertThat(loaded, `is`(not(userDetail)))
-        assertThat(loaded, `is`(updateUserDetail))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(not(userDetail)))
+        assertThat(loaded.data, `is`(updateUserDetail))
     }
 
     @ExperimentalCoroutinesApi
@@ -344,8 +377,10 @@ class LocalDataSourceTest {
         localDataSource.saveChatRoom(updateChatRoom)
 
         val loaded = localDataSource.getChatRoom(chatRoom.id)
-        assertThat(loaded, `is`(chatRoom))
-        assertThat(loaded, `is`(not(updateChatRoom)))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(chatRoom))
+        assertThat(loaded.data, `is`(not(updateChatRoom)))
     }
 
     @ExperimentalCoroutinesApi
@@ -362,8 +397,10 @@ class LocalDataSourceTest {
         localDataSource.saveChatMessage(updatedChatMessage)
 
         val loaded = localDataSource.getChatMessage(message.id)
-        assertThat(loaded, `is`(message))
-        assertThat(loaded, `is`(not(updatedChatMessage)))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(message))
+        assertThat(loaded.data, `is`(not(updatedChatMessage)))
     }
 
     @ExperimentalCoroutinesApi
@@ -379,7 +416,9 @@ class LocalDataSourceTest {
         localDataSource.deleteAllUsers()
 
         val loaded = localDataSource.getUsers()
-        assertThat(loaded, `is`(emptyList()))
+        assertThat(loaded is Success, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(emptyList()))
     }
 
     @ExperimentalCoroutinesApi
@@ -391,7 +430,9 @@ class LocalDataSourceTest {
         localDataSource.deleteUser(user)
 
         val loaded = localDataSource.getUsers()
-        assertThat(loaded.contains(user), `is`(false))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data.contains(user), `is`(false))
     }
 
     @ExperimentalCoroutinesApi
@@ -403,7 +444,9 @@ class LocalDataSourceTest {
         localDataSource.deleteUser(user.phoneNumber)
 
         val loaded = localDataSource.getUsers()
-        assertThat(loaded.contains(user), `is`(false))
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data.contains(user), `is`(false))
     }
 
     @ExperimentalCoroutinesApi
@@ -414,10 +457,16 @@ class LocalDataSourceTest {
         localDataSource.saveUser(user)
         localDataSource.saveUserDetail(userDetail)
 
-        assertThat(localDataSource.isRegistered(user.phoneNumber), `is`(true))
+        var loaded = localDataSource.isRegistered(user.phoneNumber)
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(true))
 
         localDataSource.deleteUser(user.phoneNumber)
-        assertThat(localDataSource.isRegistered(user.phoneNumber), `is`(false))
+        loaded = localDataSource.isRegistered(user.phoneNumber)
+        assertThat(loaded.succeeded, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(false))
     }
 
     @ExperimentalCoroutinesApi
@@ -436,8 +485,14 @@ class LocalDataSourceTest {
 
         localDataSource.deleteAllUsers()
 
-        assertThat(localDataSource.getUsers(), `is`(emptyList()))
-        assertThat(localDataSource.getUserDetails(), `is`(emptyList()))
+        val loadedUsers = localDataSource.getUsers()
+        assertThat(loadedUsers is Success, `is`(true))
+        loadedUsers as Success
+        assertThat(loadedUsers.data, `is`(emptyList()))
+        val loadedUserDetails = localDataSource.getUserDetails()
+        assertThat(loadedUserDetails is Success, `is`(true))
+        loadedUserDetails as Success
+        assertThat(loadedUserDetails.data, `is`(emptyList()))
     }
 
     @ExperimentalCoroutinesApi
@@ -450,7 +505,8 @@ class LocalDataSourceTest {
 
         localDataSource.deleteUser(user)
 
-        assertThat(localDataSource.getUserDetail(userDetail.phoneNumber), `is`(nullValue()))
+        val loaded = localDataSource.getUserDetail(userDetail.phoneNumber)
+        assertThat(loaded is Error, `is`(true))
     }
 
     @ExperimentalCoroutinesApi
@@ -470,7 +526,8 @@ class LocalDataSourceTest {
         localDataSource.deleteAllChatRooms()
 
         val loaded = localDataSource.getChatRooms()
-        assertThat(loaded, `is`(emptyList()))
+        assertThat(loaded is Success, `is`(true))
+        assertThat((loaded as Success).data, `is`(emptyList()))
     }
 
     @ExperimentalCoroutinesApi
@@ -484,7 +541,7 @@ class LocalDataSourceTest {
         localDataSource.deleteChatRoom(chatRoom)
 
         val loaded = localDataSource.getChatRoom(chatRoom.id)
-        assertThat(loaded, `is`(nullValue()))
+        assertThat(loaded is Error, `is`(true))
     }
 
     @ExperimentalCoroutinesApi
@@ -498,7 +555,7 @@ class LocalDataSourceTest {
         localDataSource.deleteChatRoom(chatRoom.id)
 
         val loaded = localDataSource.getChatRoom(chatRoom.id)
-        assertThat(loaded, `is`(nullValue()))
+        assertThat(loaded is Error, `is`(true))
     }
 
     @ExperimentalCoroutinesApi
@@ -529,7 +586,8 @@ class LocalDataSourceTest {
         localDataSource.deleteAllChatMessages()
 
         val loaded = localDataSource.getChatMessages()
-        assertThat(loaded, `is`(emptyList()))
+        assertThat(loaded is Success, `is`(true))
+        assertThat((loaded as Success).data, `is`(emptyList()))
     }
 
     @ExperimentalCoroutinesApi
@@ -561,9 +619,13 @@ class LocalDataSourceTest {
 
         // Only chat messages with given chatRoomId are deleted
         var loaded = localDataSource.getChatMessages(chatRoom1.id)
-        assertThat(loaded, `is`(emptyList()))
+        assertThat(loaded is Success, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(emptyList()))
         loaded = localDataSource.getChatMessages(chatRoom2.id)
-        assertThat(loaded, `is`(chatRoom2Messages))
+        assertThat(loaded is Success, `is`(true))
+        loaded as Success
+        assertThat(loaded.data, `is`(chatRoom2Messages))
     }
 
     @ExperimentalCoroutinesApi
@@ -583,7 +645,7 @@ class LocalDataSourceTest {
         localDataSource.deleteChatMessage(selectedMessage)
 
         val loaded = localDataSource.getChatMessage(selectedMessage.id)
-        assertThat(loaded, `is`(nullValue()))
+        assertThat(loaded is Error, `is`(true))
     }
 
     @ExperimentalCoroutinesApi
@@ -603,6 +665,6 @@ class LocalDataSourceTest {
         localDataSource.deleteChatMessage(selectedMessage.id)
 
         val loaded = localDataSource.getChatMessage(selectedMessage.id)
-        assertThat(loaded, `is`(nullValue()))
+        assertThat(loaded is Error, `is`(true))
     }
 }
