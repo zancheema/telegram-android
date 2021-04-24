@@ -92,11 +92,11 @@ class RemoteDataSource @Inject constructor() : AppDataSource {
         TODO("Not yet implemented")
     }
 
-    override suspend fun saveUser(user: User) {
+    override suspend fun saveUser(user: User): Result<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun saveUserDetail(detail: UserDetail) {
+    override suspend fun saveUserDetail(detail: UserDetail): Result<Boolean> {
         TODO("Not yet implemented")
     }
 

@@ -9,8 +9,6 @@ interface AppRepository {
 
     suspend fun getUsers(): Result<List<User>>
 
-    suspend fun refreshUser(phoneNumber: String)
-
     fun observeUserDetails(): Flow<Result<List<UserDetail>>>
 
     suspend fun getUserDetails(forceUpdate: Boolean = false): Result<List<UserDetail>>
@@ -76,21 +74,17 @@ interface AppRepository {
 
     suspend fun isRegistered(phoneNumber: String, forceUpdate: Boolean = false): Result<Boolean>
 
-    suspend fun saveUser(user: User)
+    suspend fun saveUser(user: User): Result<Boolean>
 
-    suspend fun saveUserDetail(detail: UserDetail)
-
-    suspend fun saveChatMessage(message: ChatMessage)
+    suspend fun saveUserDetail(detail: UserDetail): Result<Boolean>
 
     suspend fun saveChatRoom(room: ChatRoom)
+
+    suspend fun saveChatMessage(message: ChatMessage)
 
     suspend fun deleteAllUsers()
 
     suspend fun deleteUser(phoneNumber: String)
-
-    suspend fun deleteAllUserDetails()
-
-    suspend fun deleteUserDetail(phoneNumber: String)
 
     suspend fun deleteAllChatRooms()
 

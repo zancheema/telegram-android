@@ -53,9 +53,9 @@ interface AppDataSource {
 
     suspend fun isRegistered(phoneNumber: String): Result<Boolean>
 
-    suspend fun saveUser(user: User)
+    suspend fun saveUser(user: User): Result<Boolean>
 
-    suspend fun saveUserDetail(detail: UserDetail)
+    suspend fun saveUserDetail(detail: UserDetail): Result<Boolean>
 
     suspend fun saveChatMessage(message: ChatMessage)
 

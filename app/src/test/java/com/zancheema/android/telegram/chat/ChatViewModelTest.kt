@@ -56,7 +56,6 @@ class ChatViewModelTest {
     fun cleanUp() = runBlockingTest {
         repository.apply {
             deleteAllUsers()
-            deleteAllUserDetails()
             deleteAllChatRooms()
             deleteAllChatMessages()
         }

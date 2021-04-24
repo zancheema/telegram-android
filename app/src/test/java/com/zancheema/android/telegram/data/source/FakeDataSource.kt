@@ -1,21 +1,37 @@
 package com.zancheema.android.telegram.data.source
 
 import com.zancheema.android.telegram.data.Result
+import com.zancheema.android.telegram.data.Result.Error
+import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.domain.*
 import kotlinx.coroutines.flow.Flow
+import java.lang.Exception
 
 class FakeDataSource : AppDataSource {
 
-    private val users = mutableListOf<User>()
-    private val userDetails = mutableListOf<UserDetail>()
+    private val users = mutableMapOf<String, User>()
+    private val userDetails = mutableMapOf<String, UserDetail>()
+    private val chatRooms = mutableMapOf<String, ChatRoom>()
+    private val chatMessages = mutableMapOf<String, ChatMessage>()
+
+    var returnError = false
+
+    fun setChatRooms(rooms: List<ChatRoom>) {
+        chatRooms.clear()
+        for (r in rooms) chatRooms[r.id] = r
+    }
+
+    fun setChatMessages(messages: List<ChatMessage>) {
+        chatMessages.clear()
+        for (m in messages) chatMessages[m.id] = m
+    }
 
     override fun observeUsers(): Flow<Result<List<User>>> {
         TODO("Not yet implemented")
     }
 
     override suspend fun getUsers(): Result<List<User>> {
-        TODO("Not yet implemented")
-//        return users
+        return Success(users.values.toList())
     }
 
     override fun observeUserDetails(): Flow<Result<List<UserDetail>>> {
@@ -27,12 +43,13 @@ class FakeDataSource : AppDataSource {
     }
 
     override suspend fun getUserDetails(): Result<List<UserDetail>> {
-        TODO("Not yet implemented")
-//        return userDetails
+        return Success(userDetails.values.toList())
     }
 
     override suspend fun getUserDetails(phoneNumbers: List<String>): Result<List<UserDetail>> {
-        TODO("Not yet implemented")
+        val details = userDetails.values.toList()
+            .filter { phoneNumbers.contains(it.phoneNumber) }
+        return Success(details)
     }
 
     override fun observeUserDetail(phoneNumber: String): Flow<Result<UserDetail>> {
@@ -40,7 +57,12 @@ class FakeDataSource : AppDataSource {
     }
 
     override suspend fun getUserDetail(phoneNumber: String): Result<UserDetail> {
-        TODO("Not yet implemented")
+        val detail = userDetails[phoneNumber] ?: return getError("UserDetail not found")
+        return Success(detail)
+    }
+
+    private fun getError(message: String): Error {
+        return Error(Exception(message))
     }
 
     override fun observeChatRooms(): Flow<Result<List<ChatRoom>>> {
@@ -48,7 +70,7 @@ class FakeDataSource : AppDataSource {
     }
 
     override suspend fun getChatRooms(): Result<List<ChatRoom>> {
-        TODO("Not yet implemented")
+        return Success(chatRooms.values.toList())
     }
 
     override fun observeChatRoom(id: String): Flow<Result<ChatRoom>> {
@@ -56,7 +78,8 @@ class FakeDataSource : AppDataSource {
     }
 
     override suspend fun getChatRoom(id: String): Result<ChatRoom> {
-        TODO("Not yet implemented")
+        val room = chatRooms[id] ?: return getError("ChatRoom not found")
+        return Success(room)
     }
 
     override fun observeChats(): Flow<Result<List<Chat>>> {
@@ -76,11 +99,12 @@ class FakeDataSource : AppDataSource {
     }
 
     override suspend fun getChatMessages(): Result<List<ChatMessage>> {
-        TODO("Not yet implemented")
+        return Success(chatMessages.values.toList())
     }
 
     override suspend fun getChatMessages(chatRoomId: String): Result<List<ChatMessage>> {
-        TODO("Not yet implemented")
+        val messages = chatMessages.values.filter { it.chatRoomId == chatRoomId }
+        return Success(messages.toList())
     }
 
     override fun observeChatMessage(id: String): Flow<Result<ChatMessage>> {
@@ -88,31 +112,38 @@ class FakeDataSource : AppDataSource {
     }
 
     override suspend fun getChatMessage(id: String): Result<ChatMessage> {
-        TODO("Not yet implemented")
+        val message = chatMessages[id] ?: return getError("ChatMessage not found")
+        return Success(message)
     }
 
     override suspend fun isRegistered(phoneNumber: String): Result<Boolean> {
-        TODO("Not yet implemented")
+        val detail = userDetails.values.firstOrNull { it.phoneNumber == phoneNumber }
+        return Success(detail != null)
     }
 
-    override suspend fun saveUser(user: User) {
-        users.add(user)
+    override suspend fun saveUser(user: User): Result<Boolean> {
+        if (returnError) return getError("Error saving User")
+        users[user.phoneNumber] = user
+        return Success(true)
     }
 
-    override suspend fun saveUserDetail(detail: UserDetail) {
-        userDetails.add(detail)
+    override suspend fun saveUserDetail(detail: UserDetail): Result<Boolean> {
+        if (returnError) return getError("Error saving UserDetail")
+        userDetails[detail.phoneNumber] = detail
+        return Success(true)
     }
 
     override suspend fun saveChatMessage(message: ChatMessage) {
-        TODO("Not yet implemented")
+        chatMessages[message.id] = message
     }
 
     override suspend fun saveChatRoom(room: ChatRoom) {
-        TODO("Not yet implemented")
+        chatRooms[room.id] = room
     }
 
     override suspend fun deleteAllUsers() {
-        TODO("Not yet implemented")
+        users.clear()
+        userDetails.clear()
     }
 
     override suspend fun deleteUser(user: User) {
@@ -120,34 +151,38 @@ class FakeDataSource : AppDataSource {
     }
 
     override suspend fun deleteUser(phoneNumber: String) {
-        TODO("Not yet implemented")
+        users.remove(phoneNumber)
     }
 
     override suspend fun deleteAllChatRooms() {
-        TODO("Not yet implemented")
+        chatRooms.clear()
     }
 
     override suspend fun deleteChatRoom(room: ChatRoom) {
-        TODO("Not yet implemented")
+        deleteChatRoom(room.id)
     }
 
     override suspend fun deleteChatRoom(id: String) {
-        TODO("Not yet implemented")
+        chatRooms.remove(id)
     }
 
     override suspend fun deleteAllChatMessages() {
-        TODO("Not yet implemented")
+        chatMessages.clear()
     }
 
     override suspend fun deleteChatMessages(chatRoomId: String) {
-        TODO("Not yet implemented")
+        val messages = chatMessages.values.toMutableList()
+        messages.removeIf { it.chatRoomId == chatRoomId }
+
+        chatMessages.clear()
+        for (m in messages) chatMessages[m.id] = m
     }
 
     override suspend fun deleteChatMessage(message: ChatMessage) {
-        TODO("Not yet implemented")
+        deleteChatMessage(message.id)
     }
 
     override suspend fun deleteChatMessage(id: String) {
-        TODO("Not yet implemented")
+        chatMessages.remove(id)
     }
 }

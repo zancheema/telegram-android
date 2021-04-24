@@ -194,12 +194,24 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun saveUser(user: User) = withContext(ioDispatcher) {
-        database.userDao().insertUser(user.asDatabaseEntity())
+    override suspend fun saveUser(user: User): Result<Boolean> = withContext(ioDispatcher) {
+        try {
+            database.userDao().insertUser(user.asDatabaseEntity())
+            Success(true)
+        } catch (e: Exception) {
+            Log.w(TAG, "saveUserDetail: ", e)
+            Error(e)
+        }
     }
 
-    override suspend fun saveUserDetail(detail: UserDetail) = withContext(ioDispatcher) {
-        database.userDetailDao().insertUserDetail(detail.asDatabaseEntity())
+    override suspend fun saveUserDetail(detail: UserDetail): Result<Boolean> = withContext(ioDispatcher) {
+        try {
+            database.userDetailDao().insertUserDetail(detail.asDatabaseEntity())
+            Success(true)
+        } catch (e: Exception) {
+            Log.w(TAG, "saveUserDetail: ", e)
+            Error(e)
+        }
     }
 
     override suspend fun saveChatMessage(message: ChatMessage) = withContext(ioDispatcher) {

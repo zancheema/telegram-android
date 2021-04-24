@@ -64,15 +64,6 @@ class FakeRepository @Inject constructor() : AppRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun refreshUser(phoneNumber: String) {
-        val tmp = observableUsers.value.toMutableList()
-        tmp.removeIf { it.phoneNumber == phoneNumber }
-        usersServiceData[phoneNumber]?.let {
-            tmp.add(it)
-        }
-        observableUsers.value = tmp
-    }
-
     private fun refreshUsers() {
         observableUsers.value = usersServiceData.values.toList()
     }
@@ -94,10 +85,6 @@ class FakeRepository @Inject constructor() : AppRepository {
     }
 
     override suspend fun deleteUser(phoneNumber: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteUserDetail(phoneNumber: String) {
         TODO("Not yet implemented")
     }
 
@@ -247,12 +234,14 @@ class FakeRepository @Inject constructor() : AppRepository {
         }
     }
 
-    override suspend fun saveUser(user: User) = withContext(Dispatchers.Main) {
+    override suspend fun saveUser(user: User): Result<Boolean> = withContext(Dispatchers.Main) {
         usersServiceData[user.phoneNumber] = user
+        Success(true)
     }
 
-    override suspend fun saveUserDetail(detail: UserDetail) = withContext(Dispatchers.Main) {
+    override suspend fun saveUserDetail(detail: UserDetail): Result<Boolean> = withContext(Dispatchers.Main) {
         userDetailsServiceData[detail.phoneNumber] = detail
+        Success(true)
     }
 
     override suspend fun saveChatMessage(message: ChatMessage) {
@@ -266,9 +255,6 @@ class FakeRepository @Inject constructor() : AppRepository {
 
     override suspend fun deleteAllUsers() {
         observableUsers.value = emptyList()
-    }
-
-    override suspend fun deleteAllUserDetails() {
         observableUserDetails.value = emptyList()
     }
 
