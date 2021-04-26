@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "phoneNumber": "String",
+      "firstName": "String",
+      "lastName": "String",
+      "photoUrl": "String",
+      "chatRooms": [
+        {
+          "id": "String",
+          "phoneNumber": "String",
+          "chatMessages": [
+            {
+              "id": "String",
+              "chatRoomId": "String",
+              "message": "String",
+              "isMine": "Boolean",
+              "timestamp": "Number"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

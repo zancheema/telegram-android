@@ -110,6 +110,7 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebase_bom_version")
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1' // await
+    implementation 'com.google.firebase:firebase-firestore-ktx'
 
     // utilities
     implementation "com.hbb20:ccp:$country_code_picker_version"

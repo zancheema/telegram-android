@@ -34,5 +34,6 @@ data class DbUserDetail(
 fun DbUserDetail.asDomainModel() = UserDetail(
     phoneNumber = phoneNumber,
     firstName = firstName,
-    lastName = lastName
+    lastName = lastName,
+    photoUrl = photoUrl
 )

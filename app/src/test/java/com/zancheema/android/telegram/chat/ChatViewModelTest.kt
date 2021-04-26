@@ -6,13 +6,15 @@ import com.zancheema.android.telegram.MainCoroutineRule
 import com.zancheema.android.telegram.R
 import com.zancheema.android.telegram.data.Result.Success
 import com.zancheema.android.telegram.data.source.FakeRepository
-import com.zancheema.android.telegram.data.source.domain.*
+import com.zancheema.android.telegram.data.source.domain.ChatMessage
+import com.zancheema.android.telegram.data.source.domain.ChatRoom
+import com.zancheema.android.telegram.data.source.domain.User
+import com.zancheema.android.telegram.data.source.domain.UserDetail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
-import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -48,16 +50,6 @@ class ChatViewModelTest {
             saveUserDetail(receiver)
 
             saveChatRoom(chatRoom)
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    @After
-    fun cleanUp() = runBlockingTest {
-        repository.apply {
-            deleteAllUsers()
-            deleteAllChatRooms()
-            deleteAllChatMessages()
         }
     }
 
