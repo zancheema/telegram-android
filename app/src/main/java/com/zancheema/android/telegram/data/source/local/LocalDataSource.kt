@@ -11,6 +11,7 @@ import com.zancheema.android.telegram.data.source.local.view.asDomainModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 private const val TAG = "LocalDataSource"
@@ -20,7 +21,8 @@ class LocalDataSource(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AppDataSource {
     override fun observeUsers(): Flow<Result<List<User>>> {
-        TODO("Not yet implemented")
+        return database.userDao().observeAll()
+            .map { users -> Success(users.map { it.asDomainModel() }) }
     }
 
     override suspend fun getUsers(): Result<List<User>> {
@@ -35,7 +37,8 @@ class LocalDataSource(
     }
 
     override fun observeUserDetails(): Flow<Result<List<UserDetail>>> {
-        TODO("Not yet implemented")
+        return database.userDetailDao().observeAll()
+            .map { details -> Success(details.map { it.asDomainModel() }) }
     }
 
     override suspend fun getUserDetails(): Result<List<UserDetail>> {
@@ -50,7 +53,8 @@ class LocalDataSource(
     }
 
     override fun observeUserDetails(phoneNumbers: List<String>): Flow<Result<List<UserDetail>>> {
-        TODO("Not yet implemented")
+        return database.userDetailDao().observeUserDetailsByPhoneNumbers(phoneNumbers)
+            .map { details -> Success(details.map { it.asDomainModel() }) }
     }
 
     override suspend fun getUserDetails(
@@ -68,7 +72,11 @@ class LocalDataSource(
     }
 
     override fun observeUserDetail(phoneNumber: String): Flow<Result<UserDetail>> {
-        TODO("Not yet implemented")
+        return database.userDetailDao().observeUserDetailByPhoneNumber(phoneNumber)
+            .map { detail ->
+                if (detail == null) getError("UserDetail does not exist locally")
+                else Success(detail.asDomainModel())
+            }
     }
 
     override suspend fun getUserDetail(phoneNumber: String): Result<UserDetail> {
@@ -85,7 +93,8 @@ class LocalDataSource(
     }
 
     override fun observeChatRooms(): Flow<Result<List<ChatRoom>>> {
-        TODO("Not yet implemented")
+        return database.chatRoomDao().observeAll()
+            .map { rooms -> Success(rooms.map { it.asDomainModel() }) }
     }
 
     override suspend fun getChatRooms(): Result<List<ChatRoom>> {
@@ -101,7 +110,11 @@ class LocalDataSource(
     }
 
     override fun observeChatRoom(id: String): Flow<Result<ChatRoom>> {
-        TODO("Not yet implemented")
+        return database.chatRoomDao().observeById(id)
+            .map { room ->
+                if (room == null) getError("ChatRoom does not exist locally")
+                else Success(room.asDomainModel())
+            }
     }
 
     override suspend fun getChatRoom(id: String): Result<ChatRoom> {
@@ -118,7 +131,8 @@ class LocalDataSource(
     }
 
     override fun observeChats(): Flow<Result<List<Chat>>> {
-        TODO("Not yet implemented")
+        return database.chatRoomDao().observeAllChats()
+            .map { chats -> Success(chats.map { it.asDomainModel() }) }
     }
 
     override suspend fun getChats(): Result<List<Chat>> {
@@ -134,7 +148,8 @@ class LocalDataSource(
     }
 
     override fun observeChatMessages(): Flow<Result<List<ChatMessage>>> {
-        TODO("Not yet implemented")
+        return database.chatMessageDao().observeAll()
+            .map { messages -> Success(messages.map { it.asDomainModel() }) }
     }
 
     override suspend fun getChatMessages(): Result<List<ChatMessage>> {
@@ -150,7 +165,8 @@ class LocalDataSource(
     }
 
     override fun observeChatMessages(chatRoomId: String): Flow<Result<List<ChatMessage>>> {
-        TODO("Not yet implemented")
+        return database.chatMessageDao().observeByChatRoomId(chatRoomId)
+            .map { messages -> Success(messages.map { it.asDomainModel() }) }
     }
 
     override suspend fun getChatMessages(
@@ -168,7 +184,15 @@ class LocalDataSource(
     }
 
     override fun observeChatMessage(id: String): Flow<Result<ChatMessage>> {
-        TODO("Not yet implemented")
+        return database.chatMessageDao().observeById(id)
+            .map { message ->
+                if (message == null) getError("ChatMessage does not exist locally")
+                else Success(message.asDomainModel())
+            }
+    }
+
+    private fun getError(message: String): Error {
+        return Error(Exception(message))
     }
 
     override suspend fun getChatMessage(id: String): Result<ChatMessage> {
@@ -204,15 +228,16 @@ class LocalDataSource(
         }
     }
 
-    override suspend fun saveUserDetail(detail: UserDetail): Result<Boolean> = withContext(ioDispatcher) {
-        try {
-            database.userDetailDao().insertUserDetail(detail.asDatabaseEntity())
-            Success(true)
-        } catch (e: Exception) {
-            Log.w(TAG, "saveUserDetail: ", e)
-            Error(e)
+    override suspend fun saveUserDetail(detail: UserDetail): Result<Boolean> =
+        withContext(ioDispatcher) {
+            try {
+                database.userDetailDao().insertUserDetail(detail.asDatabaseEntity())
+                Success(true)
+            } catch (e: Exception) {
+                Log.w(TAG, "saveUserDetail: ", e)
+                Error(e)
+            }
         }
-    }
 
     override suspend fun saveChatMessage(message: ChatMessage) = withContext(ioDispatcher) {
         database.chatMessageDao().insert(message.asDatabaseEntity())
