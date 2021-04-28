@@ -1,12 +1,9 @@
 package com.zancheema.android.telegram.data.source.remote
 
 import android.util.Log
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.zancheema.android.telegram.data.Result
 import com.zancheema.android.telegram.data.Result.Error
 import com.zancheema.android.telegram.data.Result.Success
-import com.zancheema.android.telegram.data.source.AppContentProvider
 import com.zancheema.android.telegram.data.source.AppDataSource
 import com.zancheema.android.telegram.data.source.domain.*
 import com.zancheema.android.telegram.data.source.remote.dto.ChatMessageDTO
@@ -22,21 +19,9 @@ import kotlinx.coroutines.withContext
 private const val TAG = "RemoteDataSource"
 
 class RemoteDataSource(
-    private val contentProvider: AppContentProvider,
+    private val firestore: Firestore,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AppDataSource {
-
-    private fun usersCollection() = Firebase.firestore.collection("users")
-
-    private fun currentUserDoc() = usersCollection()
-        .document(contentProvider.getCurrentUserPhoneNumber() ?: "")
-
-    private fun chatRoomsCollection() = currentUserDoc()
-        .collection("chatRooms")
-
-    private fun chatMessagesCollection(chatRoomId: String) = chatRoomsCollection()
-        .document(chatRoomId)
-        .collection("chatMessages")
 
     override fun observeUsers(): Flow<Result<List<User>>> {
         TODO("Not yet implemented")
@@ -60,7 +45,7 @@ class RemoteDataSource(
 
     override suspend fun getUserDetails(phoneNumbers: List<String>): Result<List<UserDetail>> {
         return try {
-            val users = usersCollection().whereIn("phoneNumber", phoneNumbers)
+            val users = firestore.usersCollection().whereIn("phoneNumber", phoneNumbers)
                 .get()
                 .await()
                 .toObjects(UserDTO::class.java)
@@ -77,7 +62,7 @@ class RemoteDataSource(
 
     override suspend fun getUserDetail(phoneNumber: String): Result<UserDetail> {
         return try {
-            val user = usersCollection()
+            val user = firestore.usersCollection()
                 .document(phoneNumber)
                 .get()
                 .await()
@@ -96,7 +81,7 @@ class RemoteDataSource(
 
     override suspend fun getChatRooms(): Result<List<ChatRoom>> {
         return try {
-            val rooms = chatRoomsCollection()
+            val rooms = firestore.chatRoomsCollection()
                 .get()
                 .await()
                 .toObjects(ChatRoomDTO::class.java)
@@ -114,7 +99,7 @@ class RemoteDataSource(
 
     override suspend fun getChatRoom(id: String): Result<ChatRoom> {
         return try {
-            val room = chatRoomsCollection()
+            val room = firestore.chatRoomsCollection()
                 .document(id)
                 .get()
                 .await()
@@ -149,7 +134,7 @@ class RemoteDataSource(
 
     override suspend fun getChatMessages(chatRoomId: String): Result<List<ChatMessage>> {
         return try {
-            val messages = chatMessagesCollection(chatRoomId)
+            val messages = firestore.chatMessagesCollection(chatRoomId)
                 .get()
                 .await()
                 .toObjects(ChatMessageDTO::class.java)
@@ -187,7 +172,7 @@ class RemoteDataSource(
     override suspend fun saveUserDetail(detail: UserDetail): Result<Boolean> =
         withContext(ioDispatcher) {
             try {
-                usersCollection()
+                firestore.usersCollection()
                     .document(detail.phoneNumber)
                     .set(detail.asDataTransferObject())
                     .await()
@@ -201,7 +186,7 @@ class RemoteDataSource(
     override suspend fun saveChatMessage(message: ChatMessage) {
         try {
             withContext(ioDispatcher) {
-                chatMessagesCollection(message.chatRoomId)
+                firestore.chatMessagesCollection(message.chatRoomId)
                     .document(message.id)
                     .set(message.asDataTransferObject())
                     .await()
@@ -214,7 +199,7 @@ class RemoteDataSource(
     override suspend fun saveChatRoom(room: ChatRoom) {
         try {
             withContext(ioDispatcher) {
-                chatRoomsCollection()
+                firestore.chatRoomsCollection()
                     .document(room.id)
                     .set(room.asDataTransferObject())
                     .await()
@@ -231,7 +216,7 @@ class RemoteDataSource(
     override suspend fun deleteUser(user: User) {
         try {
             withContext(ioDispatcher) {
-                usersCollection().document(user.phoneNumber)
+                firestore.usersCollection().document(user.phoneNumber)
                     .delete()
                     .await()
             }
@@ -243,7 +228,7 @@ class RemoteDataSource(
     override suspend fun deleteUser(phoneNumber: String) {
         try {
             withContext(ioDispatcher) {
-                usersCollection()
+                firestore.usersCollection()
                     .document(phoneNumber)
                     .delete()
                     .await()
@@ -256,7 +241,7 @@ class RemoteDataSource(
     override suspend fun deleteAllChatRooms() {
         try {
             withContext(ioDispatcher) {
-                chatRoomsCollection()
+                firestore.chatRoomsCollection()
                     .get()
                     .await()
                     .toObjects(ChatRoomDTO::class.java)
@@ -273,7 +258,7 @@ class RemoteDataSource(
     override suspend fun deleteChatRoom(room: ChatRoom) {
         try {
             withContext(ioDispatcher) {
-                chatRoomsCollection().document(room.id)
+                firestore.chatRoomsCollection().document(room.id)
                     .delete()
                     .await()
             }
@@ -285,7 +270,7 @@ class RemoteDataSource(
     override suspend fun deleteChatRoom(id: String) {
         try {
             withContext(ioDispatcher) {
-                chatRoomsCollection()
+                firestore.chatRoomsCollection()
                     .document(id)
                     .delete()
                     .await()
@@ -302,7 +287,7 @@ class RemoteDataSource(
     override suspend fun deleteChatMessages(chatRoomId: String) {
         try {
             withContext(ioDispatcher) {
-                chatMessagesCollection(chatRoomId)
+                firestore.chatMessagesCollection(chatRoomId)
                     .get()
                     .await()
                     .toObjects(ChatMessageDTO::class.java)
@@ -318,7 +303,7 @@ class RemoteDataSource(
     override suspend fun deleteChatMessage(message: ChatMessage) {
         try {
             withContext(ioDispatcher) {
-                chatMessagesCollection(message.chatRoomId)
+                firestore.chatMessagesCollection(message.chatRoomId)
                     .document(message.id)
                     .delete()
                     .await()

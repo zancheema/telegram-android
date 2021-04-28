@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.zancheema.android.telegram.data.source.*
 import com.zancheema.android.telegram.data.source.local.AppDatabase
 import com.zancheema.android.telegram.data.source.local.LocalDataSource
+import com.zancheema.android.telegram.data.source.remote.Firestore
 import com.zancheema.android.telegram.data.source.remote.RemoteDataSource
 import dagger.Module
 import dagger.Provides
@@ -32,10 +33,10 @@ object AppModule  {
     @RemoteAppDataSource
     @Provides
     fun provideRemoteDataSource(
-        contentProvider: AppContentProvider,
+        firestore: Firestore,
         ioDispatcher: CoroutineDispatcher
     ): AppDataSource {
-        return RemoteDataSource(contentProvider, ioDispatcher)
+        return RemoteDataSource(firestore, ioDispatcher)
     }
 
     @Singleton
@@ -62,6 +63,14 @@ object AppModule  {
     @Provides
     fun provideIoDispatcher(): CoroutineDispatcher {
         return Dispatchers.IO
+    }
+
+    @Singleton
+    @Provides
+    fun provideFirestore(
+        contentProvider: AppContentProvider
+    ): Firestore {
+        return Firestore(contentProvider)
     }
 }
 

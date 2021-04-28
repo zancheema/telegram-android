@@ -25,11 +25,12 @@ import org.junit.Test
  */
 class RemoteDataSourceTest {
     // Stub Dependencies
-    // Both phone numbers are fake and save for testing
+    // Both phone numbers are fake and safe for testing
     // Because no real user data exists within these phoneNumber collections
     private val currentPhoneNumber = "+12345557654"
     private val otherPhoneNumber = "+14355556781"
     private lateinit var contentProvider: FakeContentProvider
+    private lateinit var firestore: Firestore
 
     // Class Under Test
     private lateinit var remoteDataSource: RemoteDataSource
@@ -42,7 +43,8 @@ class RemoteDataSourceTest {
 
         contentProvider = FakeContentProvider()
         contentProvider.currentPhoneNumber = currentPhoneNumber
-        remoteDataSource = RemoteDataSource(contentProvider, Dispatchers.Main)
+        firestore = Firestore(contentProvider)
+        remoteDataSource = RemoteDataSource(firestore, Dispatchers.Main)
     }
 
     @Test
