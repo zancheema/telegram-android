@@ -6,7 +6,7 @@ import com.zancheema.android.telegram.data.source.*
 import com.zancheema.android.telegram.data.source.local.AppDatabase
 import com.zancheema.android.telegram.data.source.local.LocalDataSource
 import com.zancheema.android.telegram.data.source.remote.Firestore
-import com.zancheema.android.telegram.data.source.remote.RemoteDataSource
+import com.zancheema.android.telegram.data.source.remote.FirestoreDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,7 +36,7 @@ object AppModule  {
         firestore: Firestore,
         ioDispatcher: CoroutineDispatcher
     ): AppDataSource {
-        return RemoteDataSource(firestore, ioDispatcher)
+        return FirestoreDataSource(firestore, ioDispatcher)
     }
 
     @Singleton

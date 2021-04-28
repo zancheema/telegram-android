@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 private const val TAG = "RemoteDataSource"
 
-class RemoteDataSource(
+class FirestoreDataSource(
     private val firestore: Firestore,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AppDataSource {
@@ -183,29 +183,52 @@ class RemoteDataSource(
             }
         }
 
-    override suspend fun saveChatMessage(message: ChatMessage) {
-        try {
-            withContext(ioDispatcher) {
-                firestore.chatMessagesCollection(message.chatRoomId)
-                    .document(message.id)
-                    .set(message.asDataTransferObject())
-                    .await()
-            }
-        } catch (e: Exception) {
-            Log.w(TAG, "saveChatMessage: ", e)
-        }
-    }
-
     override suspend fun saveChatRoom(room: ChatRoom) {
-        try {
-            withContext(ioDispatcher) {
+        withContext(ioDispatcher) {
+            try {
+                // Save room in current user's database
                 firestore.chatRoomsCollection()
                     .document(room.id)
                     .set(room.asDataTransferObject())
                     .await()
+
+                // Save room in other user's database
+                firestore.contentProvider.getCurrentUserPhoneNumber()?.let { phoneNumber ->
+                    firestore.chatRoomsCollection(room.phoneNumber)
+                        .document(room.id)
+                        .set(room.asDataTransferObject().copy(phoneNumber = phoneNumber))
+                        .await()
+
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "saveChatRoom: ", e)
             }
-        } catch (e: Exception) {
-            Log.w(TAG, "saveChatRoom: ", e)
+        }
+    }
+
+    override suspend fun saveChatMessage(message: ChatMessage) {
+        withContext(ioDispatcher) {
+            try {
+                // Save message in current users's database
+                firestore.chatMessagesCollection(message.chatRoomId)
+                    .document(message.id)
+                    .set(message.asDataTransferObject())
+                    .await()
+
+                // Save message in current users's database
+                when (val result = getChatRoom(message.chatRoomId)) {
+                    is Success -> {
+                        val room = result.data
+                        firestore.chatMessagesCollection(room.id, room.phoneNumber)
+                            .document(message.id)
+                            .set(message.asDataTransferObject().copy(mine = false))
+                            .await()
+                    }
+                    else -> TODO("not implemented yet")
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "saveChatMessage: ", e)
+            }
         }
     }
 
